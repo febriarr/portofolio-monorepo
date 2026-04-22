@@ -17,7 +17,7 @@ export const techCategoryRelations = relations(techCategory, ({ many }) => ({
 // techStack → many-to-one ke techCategory, many-to-many ke projects
 export const techStackRelations = relations(techStack, ({ one, many }) => ({
   category: one(techCategory, {
-    fields: [techStack.techCategoriesId],
+    fields: [techStack.techCategoryId],
     references: [techCategory.id],
   }),
   projects: many(projectTechStacks),

@@ -1,6 +1,4 @@
 import { integer, pgTable, varchar } from "drizzle-orm/pg-core"
-import { techCategory } from "./tech-category"
-import { techStack } from "./tech-stack"
 import { timestamps } from "./utils"
 import { projectCategory } from "./projectCategory"
 
