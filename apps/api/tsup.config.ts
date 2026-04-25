@@ -1,9 +1,31 @@
-import { defineConfig} from "tsup"
+import { defineConfig } from "tsup"
 
 export default defineConfig({
-  entry: ["src/index.ts"],
+  entry: ["src/server.ts"],
+
   format: ["esm"],
+
   target: "node18",
-  clean: true,
+
+  splitting: false,
+
   sourcemap: true,
+
+  clean: true,
+
+  dts: false,
+
+  minify: false,
+
+  treeshake: true,
+
+  outDir: "dist",
+
+  skipNodeModulesBundle: true,
+
+  esbuildOptions(options) {
+    options.alias = {
+      "@": "./src",
+    }
+  },
 })
