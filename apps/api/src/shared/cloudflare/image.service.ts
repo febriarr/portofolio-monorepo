@@ -8,6 +8,7 @@ import {
 } from "@/shared/cloudflare/image-type"
 import sharp from "sharp"
 import { ConflictError } from "@/shared/errors/custom-error"
+import { UploadedFile } from "@workspace/shared"
 
 export class ImageService {
   private readonly bucketName: string
@@ -54,7 +55,7 @@ export class ImageService {
     return `${this.bucketName}_${rand}.${ext}`
   }
 
-  private async processImage(file: Express.Multer.File): Promise<{
+  private async processImage(file: UploadedFile): Promise<{
     buffer: Buffer
     mimeType: string
     ext: string

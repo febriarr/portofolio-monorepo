@@ -3,9 +3,7 @@ import { Database } from "@/config/db"
 import { CreateProject, CreateProjectImages, UpdateProject } from "@workspace/validator"
 import { Project, ProjectDetails, ProjectImages } from "@workspace/shared"
 import { projectImages, projects } from "@/config/db/schema"
-import { eq } from "drizzle-orm"
-import { PgInsertBase } from "drizzle-orm/pg-core"
-import { NodePgQueryResultHKT } from "drizzle-orm/node-postgres"
+import { eq, inArray } from "drizzle-orm"
 
 export class ProjectsRepository implements IProjectsRepository {
   constructor(private readonly database: Database) {}
@@ -33,7 +31,7 @@ export class ProjectsRepository implements IProjectsRepository {
     })
   }
 
-  async update(payload: UpdateProject, id: number): Promise<Project> {
+  async update(id: number, payload: UpdateProject): Promise<Project> {
     return await this.database.transaction(async (tx) => {
       const { images, ...projectPayload } = payload
 
@@ -48,12 +46,8 @@ export class ProjectsRepository implements IProjectsRepository {
       }
 
       if (images?.length) {
-        await tx.delete(projectImages).where(eq(projectImages.projectId, id))
-
-        const validImages = images.filter(Boolean)
-
         await tx.insert(projectImages).values(
-          validImages.map((image) => ({
+          images.map((image) => ({
             projectId: project.id,
             imageUrl: image?.imageUrl,
           }))
@@ -108,5 +102,10 @@ export class ProjectsRepository implements IProjectsRepository {
     if (!deleted) {
       throw new Error(`Project with id ${id} not found`)
     }
+  }
+
+  async deleteImages(paths: string[]): Promise<void> {
+    if (!paths.length) return
+    await this.database.delete(projectImages).where(inArray(projectImages.imageUrl, paths))
   }
 }

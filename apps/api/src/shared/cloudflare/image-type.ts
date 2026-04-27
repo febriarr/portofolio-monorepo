@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { UploadedFile } from "@workspace/shared"
 
 export const commonOptionsSchema = z.object({
   bucket: z.string().min(1).optional(),
@@ -15,12 +16,9 @@ export const commonOptionsSchema = z.object({
 export type CommonOptionsType = z.infer<typeof commonOptionsSchema>
 
 export const createImageSchema = z.object({
-  file: z.custom<Express.Multer.File>(
-    (v) => !!v && typeof v === "object" && "buffer" in (v as any),
-    {
-      message: "File must be a valid Express.Multer.File object",
-    }
-  ),
+  file: z.custom<UploadedFile>((v) => !!v && typeof v === "object" && "buffer" in (v as any), {
+    message: "File must be a valid Express.Multer.File object",
+  }),
   options: commonOptionsSchema.optional(),
 })
 
@@ -38,12 +36,9 @@ export type CreateImageInput = z.infer<typeof createImageSchema>
 export type DeleteImageInput = z.infer<typeof deleteImageSchema>
 
 export const updateImageSchema = z.object({
-  newFile: z.custom<Express.Multer.File>(
-    (v) => !!v && typeof v === "object" && "buffer" in (v as any),
-    {
-      message: "New file must be a valid Express.Multer.File object",
-    }
-  ),
+  newFile: z.custom<UploadedFile>((v) => !!v && typeof v === "object" && "buffer" in (v as any), {
+    message: "New file must be a valid Express.Multer.File object",
+  }),
   oldPath: z
     .string()
     .min(1)

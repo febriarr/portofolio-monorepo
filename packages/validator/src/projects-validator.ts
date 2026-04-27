@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 export const createProjectImages = z.object({
-  projectId: z.coerce.number().int().positive(),
+  projectId: z.coerce.number().int().positive().nullish(),
   imageUrl: z.string().min(5).nullish(),
 })
 
@@ -20,10 +20,21 @@ export const createProjectSchema = z.object({
   liveUrl: z.string().min(5).nullish(),
   linkRepo: z.string().min(5).nullish(),
   categoryId: z.number().int().positive().nullish(),
-  images: z.array(createProjectImages.optional()),
+  images: z.array(createProjectImages).optional(),
 })
 
-export const updateProjectSchema = createProjectSchema.partial()
+export const updateProjectSchema = createProjectSchema.partial().extend({
+  deletedImagePaths: z
+    .array(
+      z
+        .string()
+        .min(1)
+        .refine((p) => !p.includes(".."), {
+          message: 'Path cannot contain ".."',
+        })
+    )
+    .optional(),
+})
 
 // project Images
 export type CreateProjectImages = z.infer<typeof createProjectImages>

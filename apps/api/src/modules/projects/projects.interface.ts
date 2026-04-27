@@ -1,5 +1,5 @@
 import { CreateProject, UpdateProject } from "@workspace/validator"
-import { IBaseRepository, Project, ProjectDetails } from "@workspace/shared"
+import { IBaseRepository, Project, ProjectDetails, UploadedFile } from "@workspace/shared"
 
 export interface IProjectsRepository extends IBaseRepository<
   Project,
@@ -8,6 +8,7 @@ export interface IProjectsRepository extends IBaseRepository<
   number
 > {
   findByIdWithDetail(id: number): Promise<ProjectDetails>
+  deleteImages(paths: string[]): Promise<void>
 }
 
 export interface IProjectsService extends IBaseRepository<
@@ -16,7 +17,12 @@ export interface IProjectsService extends IBaseRepository<
   UpdateProject,
   number
 > {
-  createWithImage(payload: CreateProject, image: Express.Multer.File): Promise<Project>
+  createWithImages(payload: CreateProject, images?: UploadedFile[]): Promise<Project>
+  updateWithImages(
+    id: number,
+    payload: UpdateProject,
+    images?: UploadedFile[],
+    deletedPaths?: string[]
+  ): Promise<Project>
   findByIdWithDetail(id: number): Promise<ProjectDetails>
-  updateWithImage(id: number, payload: UpdateProject, image: Express.Multer.File): Promise<Project>
 }
