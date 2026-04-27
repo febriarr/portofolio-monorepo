@@ -31,3 +31,8 @@ export interface ProjectDetails extends Project {
 export interface ProjectImagesDetails extends ProjectImages {
   project: Project
 }
+
+export interface ProjectWithMeta extends Project {
+  category: ProjectCategories | null
+  images: ProjectImages[]
+}

@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { baseFilterSchema } from "./base-filter-validator.js"
 
 export const createProjectImages = z.object({
   projectId: z.coerce.number().int().positive().nullish(),
@@ -36,6 +37,12 @@ export const updateProjectSchema = createProjectSchema.partial().extend({
     .optional(),
 })
 
+export const projectsFilterSchema = baseFilterSchema.extend({
+  search: z.string().optional(),
+  categoryId: z.coerce.number().int().positive().optional(),
+  techStackId: z.coerce.number().int().positive().optional(),
+})
+
 // project Images
 export type CreateProjectImages = z.infer<typeof createProjectImages>
 export type UpdateProjectImages = z.infer<typeof updateProjectImages>
@@ -45,3 +52,5 @@ export type UpdateProjectCategory = z.infer<typeof updateProjectCategorySchema>
 // Projects
 export type CreateProject = z.infer<typeof createProjectSchema>
 export type UpdateProject = z.infer<typeof updateProjectSchema>
+//filter
+export type ProjectsFilter = z.infer<typeof projectsFilterSchema>

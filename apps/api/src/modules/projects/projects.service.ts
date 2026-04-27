@@ -3,10 +3,13 @@ import { ImageService } from "@/shared/cloudflare/image.service"
 import {
   CreateProject,
   createProjectSchema,
+  ProjectsFilter,
+  projectsFilterSchema,
   UpdateProject,
   updateProjectSchema,
 } from "@workspace/validator"
-import { Project, ProjectDetails, UploadedFile } from "@workspace/shared"
+import { Project, ProjectDetails, ProjectWithMeta, UploadedFile } from "@workspace/shared"
+import { PaginatedResult } from "@/types/paginated-result"
 
 export class ProjectsService implements IProjectsService {
   constructor(
@@ -26,8 +29,16 @@ export class ProjectsService implements IProjectsService {
     return this.repository.update(id, data)
   }
 
-  findAll(): Promise<Project[]> {
-    return this.repository.findAll()
+  async findAll(filter?: ProjectsFilter): Promise<PaginatedResult<ProjectWithMeta>> {
+    const parsed = projectsFilterSchema.parse(filter ?? {})
+    const { data, total } = await this.repository.findAll(parsed)
+
+    return {
+      data,
+      total,
+      page: parsed.page,
+      limit: parsed.limit,
+    }
   }
 
   findById(id: number): Promise<Project> {

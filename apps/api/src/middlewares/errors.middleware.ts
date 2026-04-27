@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express"
 import { ZodError } from "zod"
 import { BaseError } from "@/shared/errors/custom-error"
+import { ErrorResponseType } from "@workspace/shared"
 
 export const errorsMiddleware = (
   error: unknown,
@@ -13,18 +14,24 @@ export const errorsMiddleware = (
   }
 
   if (error instanceof ZodError) {
-    return res.status(400).json({
+    const response: ErrorResponseType = {
       code: "VALIDATION_ERROR",
       message: error.issues.map((issue) => issue.message).join(","),
-      field: error.issues.map((issue) => issue.path).join(","),
+      field: error.issues.map((issue) =>
+        issue.path.filter((p): p is string | number => typeof p !== "symbol")
+      ),
       details: error.flatten(),
       statusCode: 400,
-    })
+    }
+    return res.status(400).json(response)
   }
+
   console.error(error)
-  return res.status(500).json({
+
+  const response: ErrorResponseType = {
     code: "INTERNAL_SERVER_ERROR",
     message: "Internal Server Error",
     statusCode: 500,
-  })
+  }
+  return res.status(500).json(response)
 }

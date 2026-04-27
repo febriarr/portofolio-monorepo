@@ -1,9 +1,16 @@
 import { IProjectsRepository } from "@/modules/projects/projects.interface"
 import { Database } from "@/config/db"
-import { CreateProject, CreateProjectImages, UpdateProject } from "@workspace/validator"
-import { Project, ProjectDetails, ProjectImages } from "@workspace/shared"
-import { projectImages, projects } from "@/config/db/schema"
-import { eq, inArray } from "drizzle-orm"
+import {
+  CreateProject,
+  CreateProjectImages,
+  ProjectsFilter,
+  UpdateProject,
+} from "@workspace/validator"
+import { Project, ProjectDetails, ProjectImages, ProjectWithMeta } from "@workspace/shared"
+import { projectImages, projects, projectTechStacks } from "@/config/db/schema"
+import { eq, ilike, inArray, SQL } from "drizzle-orm"
+import { QueryHelper } from "@/shared/helpers/query-helper"
+import { ConflictError } from "@/shared/errors/custom-error"
 
 export class ProjectsRepository implements IProjectsRepository {
   constructor(private readonly database: Database) {}
@@ -58,8 +65,52 @@ export class ProjectsRepository implements IProjectsRepository {
     })
   }
 
-  findAll(): Promise<Project[]> {
-    return this.database.query.projects.findMany({})
+  async findAll(filter?: ProjectsFilter): Promise<{ data: ProjectWithMeta[]; total: number }> {
+    const { page = 1, limit = 6, search, categoryId, techStackId } = filter ?? {}
+    const offset = (page - 1) * limit
+
+    // Resolve techStackId → projectIds via pivot
+    let techStackProjectIds: number[] | undefined
+
+    if (techStackId) {
+      const rows = await this.database
+        .select({ projectId: projectTechStacks.projectId })
+        .from(projectTechStacks)
+        .where(eq(projectTechStacks.techStackId, techStackId))
+
+      techStackProjectIds = rows.map((r) => r.projectId)
+
+      if (!techStackProjectIds.length) {
+        return { data: [], total: 0 }
+      }
+    }
+
+    // Build where conditions
+    const conditions: SQL[] = []
+
+    QueryHelper.pushIfExists(conditions, search ? ilike(projects.title, `%${search}%`) : null)
+    QueryHelper.pushIfExists(conditions, categoryId ? eq(projects.categoryId, categoryId) : null)
+    QueryHelper.pushIfExists(
+      conditions,
+      techStackProjectIds ? inArray(projects.id, techStackProjectIds) : null
+    )
+
+    const where = QueryHelper.combineConditions(conditions)
+
+    const [data, total] = await Promise.all([
+      this.database.query.projects.findMany({
+        where,
+        limit,
+        offset,
+        with: {
+          category: true,
+          images: true,
+        },
+      }),
+      this.database.$count(projects, where),
+    ])
+
+    return { data: data as ProjectWithMeta[], total }
   }
 
   async findById(id: number): Promise<Project> {
@@ -68,7 +119,7 @@ export class ProjectsRepository implements IProjectsRepository {
     })
 
     if (!project) {
-      throw new Error(`Project with id ${id} not found`)
+      throw new ConflictError(`Project with id ${id} not found`)
     }
 
     return project

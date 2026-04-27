@@ -1,7 +1,14 @@
-export interface IBaseRepository<TEntity, TCreate, TUpdate, TId> {
+export interface IBaseRepository<
+  TEntity,
+  TCreate,
+  TUpdate,
+  TId,
+  TFilter = undefined,
+  TFindAllResult = TEntity[],
+> {
   create(createPayload: TCreate): Promise<TEntity>
   update(id: TId, updatePayload: TUpdate): Promise<TEntity>
   findById(id: TId): Promise<TEntity>
-  findAll(): Promise<TEntity[]>
+  findAll(filter?: TFilter): Promise<TFindAllResult>
   delete(id: TId): Promise<void>
 }
