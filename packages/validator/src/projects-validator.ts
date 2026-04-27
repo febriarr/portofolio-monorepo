@@ -22,6 +22,7 @@ export const createProjectSchema = z.object({
   linkRepo: z.string().min(5).nullish(),
   categoryId: z.number().int().positive().nullish(),
   images: z.array(createProjectImages).optional(),
+  techStackIds: z.array(z.number().int().positive()).optional(),
 })
 
 export const updateProjectSchema = createProjectSchema.partial().extend({

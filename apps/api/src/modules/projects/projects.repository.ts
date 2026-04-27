@@ -1,12 +1,7 @@
 import { IProjectsRepository } from "@/modules/projects/projects.interface"
 import { Database } from "@/config/db"
-import {
-  CreateProject,
-  CreateProjectImages,
-  ProjectsFilter,
-  UpdateProject,
-} from "@workspace/validator"
-import { Project, ProjectDetails, ProjectImages, ProjectWithMeta } from "@workspace/shared"
+import { CreateProject, ProjectsFilter, UpdateProject } from "@workspace/validator"
+import { Project, ProjectDetails, ProjectWithMeta } from "@workspace/shared"
 import { projectImages, projects, projectTechStacks } from "@/config/db/schema"
 import { eq, ilike, inArray, SQL } from "drizzle-orm"
 import { QueryHelper } from "@/shared/helpers/query-helper"
@@ -17,7 +12,9 @@ export class ProjectsRepository implements IProjectsRepository {
 
   async create(payload: CreateProject): Promise<Project> {
     return await this.database.transaction(async (tx) => {
-      const [project] = await tx.insert(projects).values(payload).returning()
+      const { techStackIds, ...projectPayload } = payload
+
+      const [project] = await tx.insert(projects).values(projectPayload).returning()
 
       if (!project) {
         throw new Error(`Failed to create project: insert returned no rows`)
@@ -25,11 +22,19 @@ export class ProjectsRepository implements IProjectsRepository {
 
       if (payload.images?.length) {
         const validImages = payload.images.filter(Boolean)
-
         await tx.insert(projectImages).values(
           validImages.map((image) => ({
             projectId: project.id,
             imageUrl: image?.imageUrl,
+          }))
+        )
+      }
+
+      if (techStackIds?.length) {
+        await tx.insert(projectTechStacks).values(
+          techStackIds.map((techStackId) => ({
+            projectId: project.id,
+            techStackId,
           }))
         )
       }
@@ -40,7 +45,7 @@ export class ProjectsRepository implements IProjectsRepository {
 
   async update(id: number, payload: UpdateProject): Promise<Project> {
     return await this.database.transaction(async (tx) => {
-      const { images, ...projectPayload } = payload
+      const { images, techStackIds, deletedImagePaths, ...projectPayload } = payload
 
       const [project] = await tx
         .update(projects)
@@ -57,6 +62,17 @@ export class ProjectsRepository implements IProjectsRepository {
           images.map((image) => ({
             projectId: project.id,
             imageUrl: image?.imageUrl,
+          }))
+        )
+      }
+
+      // Delete then re-insert techStacks kalau ada perubahan
+      if (techStackIds?.length) {
+        await tx.delete(projectTechStacks).where(eq(projectTechStacks.projectId, id))
+        await tx.insert(projectTechStacks).values(
+          techStackIds.map((techStackId) => ({
+            projectId: project.id,
+            techStackId,
           }))
         )
       }
@@ -105,6 +121,11 @@ export class ProjectsRepository implements IProjectsRepository {
         with: {
           category: true,
           images: true,
+          techStacks: {
+            with: {
+              techStack: true,
+            },
+          },
         },
       }),
       this.database.$count(projects, where),

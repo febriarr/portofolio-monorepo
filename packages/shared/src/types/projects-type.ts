@@ -35,4 +35,5 @@ export interface ProjectImagesDetails extends ProjectImages {
 export interface ProjectWithMeta extends Project {
   category: ProjectCategories | null
   images: ProjectImages[]
+  techStacks: { techStack: TechStack }[]
 }
