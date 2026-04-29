@@ -15,8 +15,7 @@
       "@/*": ["./src/*"]
     },
 
-    "strict": true,
-    "skipLibCheck": true
+    "noImplicitOverride": true
   },
 
   "include": ["src", "drizzle.config.ts", "tsup.config.ts"]

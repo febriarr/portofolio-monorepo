@@ -4,12 +4,12 @@ import { asyncHandler } from "@/shared/helpers/async-handler"
 
 import { successResponse } from "@/shared/helpers/success-response"
 
-import { ProjectsService } from "./projects.service"
 import { UploadedFile } from "@workspace/shared"
 import { ProjectsFilter } from "@workspace/validator"
+import { IProjectsService } from "@/modules/projects/projects.interface"
 
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(private readonly projectsService: IProjectsService) {}
 
   findAll = asyncHandler(async (req: Request, res: Response) => {
     const result = await this.projectsService.findAll(req.query as unknown as ProjectsFilter)

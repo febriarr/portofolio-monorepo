@@ -1,6 +1,7 @@
 import { CreateProject, ProjectsFilter, UpdateProject } from "@workspace/validator"
 import {
   IBaseRepository,
+  IBaseService,
   Project,
   ProjectDetails,
   ProjectWithMeta,
@@ -13,24 +14,21 @@ export interface IProjectsRepository extends IBaseRepository<
   CreateProject,
   UpdateProject,
   number,
-  ProjectsFilter,
-  {
-    data: ProjectWithMeta[]
-    total: number
-  }
+  ProjectsFilter
 > {
+  findAll(): Promise<{ data: ProjectWithMeta[]; total: number }>
   findByIdWithDetail(id: number): Promise<ProjectDetails>
   deleteImages(paths: string[]): Promise<void>
 }
 
-export interface IProjectsService extends IBaseRepository<
+export interface IProjectsService extends IBaseService<
   Project,
   CreateProject,
   UpdateProject,
   number,
-  ProjectsFilter,
-  PaginatedResult<ProjectWithMeta>
+  ProjectsFilter
 > {
+  findAll(filter?: ProjectsFilter): Promise<PaginatedResult<ProjectWithMeta>>
   createWithImages(payload: CreateProject, images?: UploadedFile[]): Promise<Project>
   updateWithImages(
     id: number,

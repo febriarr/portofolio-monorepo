@@ -6,11 +6,15 @@ export interface IProjectCategoryRepository extends IBaseRepository<
   CreateProjectCategory,
   UpdateProjectCategory,
   number
-> {}
+> {
+  findAll(): Promise<ProjectCategories[]>
+}
 
 export interface IProjectCategoryService extends IBaseService<
   ProjectCategories,
   CreateProjectCategory,
   UpdateProjectCategory,
   number
-> {}
+> {
+  findAll(): Promise<ProjectCategories[]>
+}

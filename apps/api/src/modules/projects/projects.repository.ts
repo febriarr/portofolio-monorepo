@@ -1,29 +1,40 @@
-import { IProjectsRepository } from "@/modules/projects/projects.interface"
+import { BaseRepository } from "@/shared/base/base.repository"
 import { Database } from "@/config/db"
+import { projectImages, projects, projectTechStacks } from "@/config/db/schema"
 import { CreateProject, ProjectsFilter, UpdateProject } from "@workspace/validator"
 import { Project, ProjectDetails, ProjectWithMeta } from "@workspace/shared"
-import { projectImages, projects, projectTechStacks } from "@/config/db/schema"
 import { eq, ilike, inArray, SQL } from "drizzle-orm"
 import { QueryHelper } from "@/shared/helpers/query-helper"
 import { ConflictError } from "@/shared/errors/custom-error"
+import { IProjectsRepository } from "@/modules/projects/projects.interface"
 
-export class ProjectsRepository implements IProjectsRepository {
-  constructor(private readonly database: Database) {}
+export class ProjectsRepository
+  extends BaseRepository<
+    Project,
+    CreateProject,
+    UpdateProject,
+    typeof projects,
+    number,
+    ProjectsFilter,
+    { data: ProjectWithMeta[]; total: number }
+  >
+  implements IProjectsRepository
+{
+  constructor(database: Database) {
+    super(database, projects)
+  }
 
-  async create(payload: CreateProject): Promise<Project> {
-    return await this.database.transaction(async (tx) => {
-      const { techStackIds, ...projectPayload } = payload
+  // Override karena butuh transaction + insert pivot tables
+  override async create(payload: CreateProject): Promise<Project> {
+    return this.database.transaction(async (tx) => {
+      const { techStackIds, images, ...projectPayload } = payload
 
       const [project] = await tx.insert(projects).values(projectPayload).returning()
+      if (!project) throw new Error("Failed to create project: insert returned no rows")
 
-      if (!project) {
-        throw new Error(`Failed to create project: insert returned no rows`)
-      }
-
-      if (payload.images?.length) {
-        const validImages = payload.images.filter(Boolean)
+      if (images?.length) {
         await tx.insert(projectImages).values(
-          validImages.map((image) => ({
+          images.filter(Boolean).map((image) => ({
             projectId: project.id,
             imageUrl: image?.imageUrl,
           }))
@@ -31,20 +42,18 @@ export class ProjectsRepository implements IProjectsRepository {
       }
 
       if (techStackIds?.length) {
-        await tx.insert(projectTechStacks).values(
-          techStackIds.map((techStackId) => ({
-            projectId: project.id,
-            techStackId,
-          }))
-        )
+        await tx
+          .insert(projectTechStacks)
+          .values(techStackIds.map((techStackId) => ({ projectId: project.id, techStackId })))
       }
 
       return project
     })
   }
 
-  async update(id: number, payload: UpdateProject): Promise<Project> {
-    return await this.database.transaction(async (tx) => {
+  // Override karena butuh transaction + delete-reinsert pivot tables
+  override async update(id: number, payload: UpdateProject): Promise<Project> {
+    return this.database.transaction(async (tx) => {
       const { images, techStackIds, deletedImagePaths, ...projectPayload } = payload
 
       const [project] = await tx
@@ -52,29 +61,19 @@ export class ProjectsRepository implements IProjectsRepository {
         .set(projectPayload)
         .where(eq(projects.id, id))
         .returning()
-
-      if (!project) {
-        throw new Error(`Failed to update project: project with id ${id} not found`)
-      }
+      if (!project) throw new Error(`Failed to update project: id ${id} not found`)
 
       if (images?.length) {
-        await tx.insert(projectImages).values(
-          images.map((image) => ({
-            projectId: project.id,
-            imageUrl: image?.imageUrl,
-          }))
-        )
+        await tx
+          .insert(projectImages)
+          .values(images.map((image) => ({ projectId: project.id, imageUrl: image?.imageUrl })))
       }
 
-      // Delete then re-insert techStacks kalau ada perubahan
       if (techStackIds?.length) {
         await tx.delete(projectTechStacks).where(eq(projectTechStacks.projectId, id))
-        await tx.insert(projectTechStacks).values(
-          techStackIds.map((techStackId) => ({
-            projectId: project.id,
-            techStackId,
-          }))
-        )
+        await tx
+          .insert(projectTechStacks)
+          .values(techStackIds.map((techStackId) => ({ projectId: project.id, techStackId })))
       }
 
       return project
@@ -85,7 +84,6 @@ export class ProjectsRepository implements IProjectsRepository {
     const { page = 1, limit = 6, search, categoryId, techStackId } = filter ?? {}
     const offset = (page - 1) * limit
 
-    // Resolve techStackId → projectIds via pivot
     let techStackProjectIds: number[] | undefined
 
     if (techStackId) {
@@ -95,15 +93,10 @@ export class ProjectsRepository implements IProjectsRepository {
         .where(eq(projectTechStacks.techStackId, techStackId))
 
       techStackProjectIds = rows.map((r) => r.projectId)
-
-      if (!techStackProjectIds.length) {
-        return { data: [], total: 0 }
-      }
+      if (!techStackProjectIds.length) return { data: [], total: 0 }
     }
 
-    // Build where conditions
     const conditions: SQL[] = []
-
     QueryHelper.pushIfExists(conditions, search ? ilike(projects.title, `%${search}%`) : null)
     QueryHelper.pushIfExists(conditions, categoryId ? eq(projects.categoryId, categoryId) : null)
     QueryHelper.pushIfExists(
@@ -121,11 +114,7 @@ export class ProjectsRepository implements IProjectsRepository {
         with: {
           category: true,
           images: true,
-          techStacks: {
-            with: {
-              techStack: true,
-            },
-          },
+          techStacks: { with: { techStack: true } },
         },
       }),
       this.database.$count(projects, where),
@@ -139,40 +128,25 @@ export class ProjectsRepository implements IProjectsRepository {
       where: eq(projects.id, id),
     })
 
-    if (!project) {
-      throw new ConflictError(`Project with id ${id} not found`)
-    }
-
+    if (!project) throw new ConflictError(`Project with id ${id} not found`)
     return project
   }
+
   async findByIdWithDetail(id: number): Promise<ProjectDetails> {
     const project = await this.database.query.projects.findFirst({
       where: eq(projects.id, id),
       with: {
         images: true,
         category: true,
-        techStacks: {
-          with: {
-            techStack: true,
-          },
-        },
+        techStacks: { with: { techStack: true } },
       },
     })
 
-    if (!project) {
-      throw new Error(`Project with id ${id} not found`)
-    }
+    if (!project) throw new Error(`Project with id ${id} not found`)
 
     return {
       ...project,
       techStacks: project.techStacks.map((t) => t.techStack),
-    }
-  }
-  async delete(id: number): Promise<void> {
-    const [deleted] = await this.database.delete(projects).where(eq(projects.id, id)).returning()
-
-    if (!deleted) {
-      throw new Error(`Project with id ${id} not found`)
     }
   }
 

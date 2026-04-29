@@ -1,5 +1,7 @@
-import { IProjectsRepository, IProjectsService } from "@/modules/projects/projects.interface"
+import { BaseService } from "@/shared/base/base.service"
+import { ProjectsRepository } from "@/modules/projects/projects.repository"
 import { ImageService } from "@/shared/cloudflare/image.service"
+import { IProjectsService } from "@/modules/projects/projects.interface"
 import {
   CreateProject,
   createProjectSchema,
@@ -10,43 +12,48 @@ import {
 } from "@workspace/validator"
 import { Project, ProjectDetails, ProjectWithMeta, UploadedFile } from "@workspace/shared"
 import { PaginatedResult } from "@/types/paginated-result"
+import { projects } from "@/config/db/schema"
 
-export class ProjectsService implements IProjectsService {
+export class ProjectsService
+  extends BaseService<
+    Project,
+    CreateProject,
+    UpdateProject,
+    typeof projects,
+    number,
+    ProjectsFilter,
+    PaginatedResult<ProjectWithMeta>
+  >
+  implements IProjectsService
+{
   constructor(
-    private readonly repository: IProjectsRepository,
+    private readonly projectsRepository: ProjectsRepository,
     private readonly imageService: ImageService
-  ) {}
+  ) {
+    super(projectsRepository)
+  }
 
-  create(createPayload: CreateProject): Promise<Project> {
-    const data = createProjectSchema.parse(createPayload)
-
+  // Override karena ada Zod parse
+  override async create(payload: CreateProject): Promise<Project> {
+    const data = createProjectSchema.parse(payload)
     return this.repository.create(data)
   }
 
-  update(id: number, updatePayload: UpdateProject): Promise<Project> {
-    const data = updateProjectSchema.parse(updatePayload)
-
+  // Override karena ada Zod parse
+  override async update(id: number, payload: UpdateProject): Promise<Project> {
+    const data = updateProjectSchema.parse(payload)
     return this.repository.update(id, data)
   }
 
   async findAll(filter?: ProjectsFilter): Promise<PaginatedResult<ProjectWithMeta>> {
     const parsed = projectsFilterSchema.parse(filter ?? {})
-    const { data, total } = await this.repository.findAll(parsed)
+    const { data, total } = await this.projectsRepository.findAll(parsed)
 
-    return {
-      data,
-      total,
-      page: parsed.page,
-      limit: parsed.limit,
-    }
-  }
-
-  findById(id: number): Promise<Project> {
-    return this.repository.findById(id)
+    return { data, total, page: parsed.page, limit: parsed.limit }
   }
 
   findByIdWithDetail(id: number): Promise<ProjectDetails> {
-    return this.repository.findByIdWithDetail(id)
+    return this.projectsRepository.findByIdWithDetail(id)
   }
 
   async createWithImages(payload: CreateProject, images?: UploadedFile[]): Promise<Project> {
@@ -54,11 +61,10 @@ export class ProjectsService implements IProjectsService {
 
     if (images?.length) {
       const uploaded = await this.imageService.createImages(images.map((file) => ({ file })))
-      data.images = uploaded.map((img) => ({
-        imageUrl: img.path,
-      }))
+      data.images = uploaded.map((img) => ({ imageUrl: img.path }))
     }
-    return this.create(data)
+
+    return this.repository.create(data)
   }
 
   async updateWithImages(
@@ -72,7 +78,7 @@ export class ProjectsService implements IProjectsService {
     if (deletedImagePaths?.length) {
       await Promise.all([
         this.imageService.deleteImages(deletedImagePaths),
-        this.repository.deleteImages(deletedImagePaths),
+        this.projectsRepository.deleteImages(deletedImagePaths),
       ])
     }
 
@@ -81,10 +87,6 @@ export class ProjectsService implements IProjectsService {
       data.images = uploaded.map((img) => ({ imageUrl: img.path }))
     }
 
-    return this.update(id, data)
-  }
-
-  delete(id: number): Promise<void> {
-    return this.repository.delete(id)
+    return this.repository.update(id, data)
   }
 }
