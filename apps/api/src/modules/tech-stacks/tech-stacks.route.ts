@@ -14,7 +14,7 @@ techStacksRouter.post(
   upload.single("image"),
   techStacksController.createWithImage
 )
-techStacksRouter.patch("/:id", upload.single("image"), techStacksController.update)
+techStacksRouter.patch("/:id", upload.single("image"), techStacksController.updateWithImage)
 
 techStacksRouter.delete("/:id", techStacksController.delete)
 

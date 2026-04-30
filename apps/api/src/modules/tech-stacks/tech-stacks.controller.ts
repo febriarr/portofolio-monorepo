@@ -49,7 +49,7 @@ export class TechStacksController {
   })
 
   createWithImage = asyncHandler(async (req: Request, res: Response) => {
-    const image = req.file as UploadedFile
+    const image = req.file as UploadedFile | undefined
     const payload = req.body
     const result = await this.techStacksService.createWithImage(payload, image)
 
@@ -61,7 +61,7 @@ export class TechStacksController {
   })
 
   updateWithImage = asyncHandler(async (req: Request, res: Response) => {
-    const image = req.file as UploadedFile
+    const image = req.file as UploadedFile | undefined
     const payload = req.body
     const id = Number(req.params.id)
     const result = await this.techStacksService.updateWithImage(id, payload, image)
