@@ -12,7 +12,7 @@ export const createTechCategorySchema = z.object({
   name: z.string(),
 })
 
-export const updateCategorySchema = createTechCategorySchema.partial()
+export const updateTechCategorySchema = createTechCategorySchema.partial()
 
 //Tech Stacks
 export type CreateTechStack = z.infer<typeof createTechStackSchema>
@@ -20,4 +20,4 @@ export type UpdateTechStack = z.infer<typeof updateTechStackSchema>
 
 //Tech Categories
 export type CreateTechCategory = z.infer<typeof createTechCategorySchema>
-export type UpdateTechCategory = z.infer<typeof createTechCategorySchema>
+export type UpdateTechCategory = z.infer<typeof updateTechCategorySchema>
