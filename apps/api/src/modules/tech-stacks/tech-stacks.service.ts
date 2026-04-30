@@ -1,5 +1,10 @@
 import { BaseService } from "@/shared/base/base.service"
-import { CreateTechStack, createTechStackSchema, UpdateTechStack } from "@workspace/validator"
+import {
+  CreateTechStack,
+  createTechStackSchema,
+  UpdateTechStack,
+  updateTechStackSchema,
+} from "@workspace/validator"
 import { TechStack, UploadedFile } from "@workspace/shared"
 import { techStack } from "@/config/db/schema"
 import { ITechStacksService } from "@/modules/tech-stacks/tech-stacks.interface"
@@ -24,7 +29,7 @@ export class TechStacksService
   }
 
   override async update(id: number, payload: UpdateTechStack): Promise<TechStack> {
-    const data = createTechStackSchema.parse(payload)
+    const data = updateTechStackSchema.parse(payload)
     return this.repository.update(id, data)
   }
 
