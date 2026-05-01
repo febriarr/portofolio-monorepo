@@ -10,7 +10,7 @@ import {
   UpdateProject,
   updateProjectSchema,
 } from "@workspace/validator"
-import { Project, ProjectDetails, ProjectWithMeta, UploadedFile } from "@workspace/shared"
+import { Project, ProjectWithMeta, UploadedFile } from "@workspace/shared"
 import { PaginatedResult } from "@/types/paginated-result"
 import { projects } from "@/config/db/schema"
 
@@ -52,7 +52,7 @@ export class ProjectsService
     return { data, total, page: parsed.page, limit: parsed.limit }
   }
 
-  findByIdWithDetail(id: number): Promise<ProjectDetails> {
+  findByIdWithDetail(id: number): Promise<ProjectWithMeta> {
     return this.projectsRepository.findByIdWithDetail(id)
   }
 

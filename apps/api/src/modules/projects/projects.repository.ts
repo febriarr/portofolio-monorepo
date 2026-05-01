@@ -2,7 +2,7 @@ import { BaseRepository } from "@/shared/base/base.repository"
 import { Database } from "@/config/db"
 import { projectImages, projects, projectTechStacks } from "@/config/db/schema"
 import { CreateProject, ProjectsFilter, UpdateProject } from "@workspace/validator"
-import { Project, ProjectDetails, ProjectWithMeta } from "@workspace/shared"
+import { Project, ProjectWithMeta } from "@workspace/shared"
 import { eq, ilike, inArray, SQL } from "drizzle-orm"
 import { QueryHelper } from "@/shared/helpers/query-helper"
 import { ConflictError } from "@/shared/errors/custom-error"
@@ -132,7 +132,7 @@ export class ProjectsRepository
     return project
   }
 
-  async findByIdWithDetail(id: number): Promise<ProjectDetails> {
+  async findByIdWithDetail(id: number): Promise<ProjectWithMeta> {
     const project = await this.database.query.projects.findFirst({
       where: eq(projects.id, id),
       with: {
@@ -144,10 +144,7 @@ export class ProjectsRepository
 
     if (!project) throw new Error(`Project with id ${id} not found`)
 
-    return {
-      ...project,
-      techStacks: project.techStacks.map((t) => t.techStack),
-    }
+    return project
   }
 
   async deleteImages(paths: string[]): Promise<void> {

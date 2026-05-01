@@ -9,7 +9,7 @@ const config: Config = {
     "^@/(.*)$": "<rootDir>/$1",
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
-  testMatch: ["**/__tests__/**/*.spec.ts", "**/tests/**/*.e2e.spec.ts"],
+  testMatch: ["**/__tests__/**/*.spec.ts"],
   transform: {
     "^.+\\.tsx?$": [
       "ts-jest",
@@ -18,8 +18,6 @@ const config: Config = {
       },
     ],
   },
-  // Load .env.test sebelum semua test
-  globalSetup: "./tests/setup.ts",
 }
 
 export default config

@@ -3,7 +3,6 @@ import {
   IBaseRepository,
   IBaseService,
   Project,
-  ProjectDetails,
   ProjectWithMeta,
   UploadedFile,
 } from "@workspace/shared"
@@ -17,7 +16,7 @@ export interface IProjectsRepository extends IBaseRepository<
   ProjectsFilter
 > {
   findAll(): Promise<{ data: ProjectWithMeta[]; total: number }>
-  findByIdWithDetail(id: number): Promise<ProjectDetails>
+  findByIdWithDetail(id: number): Promise<ProjectWithMeta>
   deleteImages(paths: string[]): Promise<void>
 }
 
@@ -36,5 +35,5 @@ export interface IProjectsService extends IBaseService<
     images?: UploadedFile[],
     deletedPaths?: string[]
   ): Promise<Project>
-  findByIdWithDetail(id: number): Promise<ProjectDetails>
+  findByIdWithDetail(id: number): Promise<ProjectWithMeta>
 }
