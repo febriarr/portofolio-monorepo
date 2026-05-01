@@ -5,7 +5,7 @@ import { upload } from "@/middlewares/upload.middleware"
 const techStacksRouter: Router = Router()
 
 techStacksRouter.get("/", techStacksController.findAll)
-techStacksRouter.get(":id", techStacksController.findById)
+techStacksRouter.get("/:id", techStacksController.findById)
 
 techStacksRouter.post("/create", techStacksController.create)
 techStacksRouter.patch("/:id", techStacksController.update)

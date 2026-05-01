@@ -1,6 +1,7 @@
 {
   "name": "monorepo-portofolio",
   "version": "0.0.1",
+  "author": "Febri Ardiansyah",
   "private": true,
   "scripts": {
     "build": "turbo build",
