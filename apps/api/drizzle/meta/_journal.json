@@ -15,6 +15,13 @@
       "when": 1776835954480,
       "tag": "0001_lethal_blizzard",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777727800624,
+      "tag": "0002_great_nighthawk",
+      "breakpoints": true
     }
   ]
 }

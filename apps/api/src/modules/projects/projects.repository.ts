@@ -5,7 +5,7 @@ import { CreateProject, ProjectsFilter, UpdateProject } from "@workspace/validat
 import { Project, ProjectWithMeta } from "@workspace/shared"
 import { eq, ilike, inArray, SQL } from "drizzle-orm"
 import { QueryHelper } from "@/shared/helpers/query-helper"
-import { ConflictError } from "@/shared/errors/custom-error"
+import { NotFoundError } from "@/shared/errors/custom-error"
 import { IProjectsRepository } from "@/modules/projects/projects.interface"
 
 export class ProjectsRepository
@@ -61,7 +61,7 @@ export class ProjectsRepository
         .set(projectPayload)
         .where(eq(projects.id, id))
         .returning()
-      if (!project) throw new Error(`Failed to update project: id ${id} not found`)
+      if (!project) throw new NotFoundError(`Failed to update project: id ${id} not found`)
 
       if (images?.length) {
         await tx
@@ -128,7 +128,7 @@ export class ProjectsRepository
       where: eq(projects.id, id),
     })
 
-    if (!project) throw new ConflictError(`Project with id ${id} not found`)
+    if (!project) throw new NotFoundError(`Project with id ${id} not found`)
     return project
   }
 

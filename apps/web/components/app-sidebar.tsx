@@ -21,6 +21,7 @@ import {
 } from "@phosphor-icons/react"
 import { Separator } from "@workspace/ui/components/separator"
 import { Button } from "@workspace/ui/components/button"
+import { usePathname } from "next/navigation"
 
 const navMain = [
   {
@@ -30,27 +31,28 @@ const navMain = [
   },
   {
     title: "Projects",
-    link: "/projects",
+    link: "/dashboard/projects",
     icon: FoldersIcon,
   },
   {
     title: "Project Categories",
-    link: "/project-categories",
+    link: "/dashboard/project-categories",
     icon: TagIcon,
   },
   {
     title: "Tech Stacks",
-    link: "/tech-stacks",
+    link: "/dashboard/tech-stacks",
     icon: StackIcon,
   },
   {
     title: "Tech Categories",
-    link: "/tech-categories",
+    link: "/dashboard/tech-categories",
     icon: TreeStructureIcon,
   },
 ]
 
 export default function AppSidebar({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
   return (
     <>
       <Sidebar collapsible={"offcanvas"} variant={"inset"}>
@@ -70,10 +72,14 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
           <SidebarMenu>
             {navMain.map((item) => (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton tooltip={item.title} asChild>
+                <SidebarMenuButton
+                  tooltip={item.title}
+                  asChild
+                  className={`${pathname === item.link ? "bg-primary text-primary-foreground hover:bg-primary/90" : ""}`}
+                >
                   <Link href={item.link}>
                     {item.icon && <item.icon />}
-                    <span>{item.title}</span>ßß
+                    <span>{item.title}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
