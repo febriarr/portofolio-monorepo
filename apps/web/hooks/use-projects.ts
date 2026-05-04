@@ -1,22 +1,25 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { projectsService } from "@/services/projects-service"
 import { CreateProject, ProjectsFilter, UpdateProject } from "@workspace/validator"
+import { formatApiError, useAlert } from "@/hooks/use-alert"
+import { toast } from "@workspace/ui/components/sonner"
 
 export const PROJECT_KEYS = {
   all: ["projects"] as const,
   lists: () => [...PROJECT_KEYS.all, "list"] as const,
-  list: (filter?: ProjectsFilter) => [...PROJECT_KEYS.lists(), filter] as const,
+  list: (filter?: Partial<ProjectsFilter>) => [...PROJECT_KEYS.lists(), filter] as const,
   details: () => [...PROJECT_KEYS.all, "detail"] as const,
   detail: (id: number) => [...PROJECT_KEYS.details(), id] as const,
 }
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
-export const useProjects = (filter?: ProjectsFilter) => {
+export const useProjects = (filter?: Partial<ProjectsFilter>) => {
   return useQuery({
     queryKey: PROJECT_KEYS.list(filter),
     queryFn: async () => {
       const res = await projectsService.findAll(filter)
+      // Response shape: { success, message, data: ProjectWithMeta[], meta: { total, page, limit } }
       return res.data
     },
   })
@@ -37,6 +40,7 @@ export const useProject = (id: number) => {
 
 export const useCreateProject = () => {
   const queryClient = useQueryClient()
+  const { alert, hide } = useAlert()
 
   return useMutation({
     mutationFn: async ({ payload, images }: { payload: CreateProject; images?: File[] }) => {
@@ -49,12 +53,19 @@ export const useCreateProject = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.lists() })
+      hide()
+      toast.success("Success Create project")
+    },
+    onError: (error) => {
+      const { title, description } = formatApiError(error)
+      alert(title, description)
     },
   })
 }
 
 export const useUpdateProject = () => {
   const queryClient = useQueryClient()
+  const { alert, hide } = useAlert()
 
   return useMutation({
     mutationFn: async ({
@@ -76,12 +87,19 @@ export const useUpdateProject = () => {
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.lists() })
       queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.detail(id) })
+      hide()
+      toast.success("Success Update project")
+    },
+    onError: (error) => {
+      const { title, description } = formatApiError(error)
+      alert(title, description)
     },
   })
 }
 
 export const useDeleteProject = () => {
   const queryClient = useQueryClient()
+  const { alert, hide } = useAlert()
 
   return useMutation({
     mutationFn: async (id: number) => {
@@ -90,6 +108,12 @@ export const useDeleteProject = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.lists() })
+      hide()
+      toast.success("Success Delete project")
+    },
+    onError: (error) => {
+      const { title, description } = formatApiError(error)
+      alert(title, description)
     },
   })
 }

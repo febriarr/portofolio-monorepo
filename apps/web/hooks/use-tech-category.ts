@@ -3,6 +3,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { techCategory } from "@/services/tech-category"
 
 import { CreateTechCategory, UpdateTechCategory } from "@workspace/validator"
+import { formatApiError, useAlert } from "@/hooks/use-alert"
+import { toast } from "@workspace/ui/components/sonner"
 
 export const techCategoryQueryKey = {
   all: ["tech-category"] as const,
@@ -32,6 +34,7 @@ export function useTechCategory(id: number) {
 
 export function useCreateTechCategory() {
   const queryClient = useQueryClient()
+  const { hide, alert } = useAlert()
 
   return useMutation({
     mutationFn: async (payload: CreateTechCategory) => {
@@ -43,12 +46,19 @@ export function useCreateTechCategory() {
       queryClient.invalidateQueries({
         queryKey: techCategoryQueryKey.all,
       })
+      hide()
+      toast.success("Success Create Tech Category")
+    },
+    onError: (error) => {
+      const { title, description } = formatApiError(error)
+      alert(title, description)
     },
   })
 }
 
 export function useUpdateTechCategory() {
   const queryClient = useQueryClient()
+  const { hide, alert } = useAlert()
 
   return useMutation({
     mutationFn: async ({ id, payload }: { id: number; payload: UpdateTechCategory }) => {
@@ -64,12 +74,19 @@ export function useUpdateTechCategory() {
       queryClient.invalidateQueries({
         queryKey: techCategoryQueryKey.detail(variables.id),
       })
+      hide()
+      toast.success("Success Update Tech Category")
+    },
+    onError: (error) => {
+      const { title, description } = formatApiError(error)
+      alert(title, description)
     },
   })
 }
 
 export function useDeleteTechCategory() {
   const queryClient = useQueryClient()
+  const { hide, alert } = useAlert()
 
   return useMutation({
     mutationFn: async (id: number) => {
@@ -81,6 +98,12 @@ export function useDeleteTechCategory() {
       queryClient.invalidateQueries({
         queryKey: techCategoryQueryKey.all,
       })
+      hide()
+      toast.success("Success Delete Tech Category")
+    },
+    onError: (error) => {
+      const { title, description } = formatApiError(error)
+      alert(title, description)
     },
   })
 }

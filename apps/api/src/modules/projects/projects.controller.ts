@@ -29,7 +29,7 @@ export class ProjectsController {
   findById = asyncHandler(async (req: Request, res: Response) => {
     const id = Number(req.params.id)
 
-    const project = await this.projectsService.findById(id)
+    const project = await this.projectsService.findByIdWithDetail(id)
 
     return successResponse({
       res,

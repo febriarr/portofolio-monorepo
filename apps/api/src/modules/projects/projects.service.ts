@@ -49,7 +49,7 @@ export class ProjectsService
     const parsed = projectsFilterSchema.parse(filter ?? {})
     const { data, total } = await this.projectsRepository.findAll(parsed)
 
-    return { data, total, page: parsed.page, limit: parsed.limit }
+    return { data, total, page: parsed.page!, limit: parsed.limit! }
   }
 
   findByIdWithDetail(id: number): Promise<ProjectWithMeta> {

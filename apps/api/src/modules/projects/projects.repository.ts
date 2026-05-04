@@ -151,4 +151,18 @@ export class ProjectsRepository
     if (!paths.length) return
     await this.database.delete(projectImages).where(inArray(projectImages.imageUrl, paths))
   }
+
+  override async delete(id: number): Promise<Project> {
+    return this.database.transaction(async (tx) => {
+      // Hapus pivot tables dulu sebelum hapus project
+      await tx.delete(projectTechStacks).where(eq(projectTechStacks.projectId, id))
+      await tx.delete(projectImages).where(eq(projectImages.projectId, id))
+
+      const [project] = await tx.delete(projects).where(eq(projects.id, id)).returning()
+
+      if (!project) throw new NotFoundError(`Project with id ${id} not found`)
+
+      return project
+    })
+  }
 }

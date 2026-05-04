@@ -4,22 +4,22 @@ import { CreateProjectCategory, UpdateProjectCategory } from "@workspace/validat
 
 export const projectCategory = {
   findAll() {
-    return apiClient.get<ApiResponse<ProjectCategories[]>>("/project-category")
+    return apiClient.get<ApiResponse<ProjectCategories[]>>("/project-categories")
   },
 
   findById(id: number) {
-    return apiClient.get<ApiResponse<ProjectCategories>>(`project-category/${id}`)
+    return apiClient.get<ApiResponse<ProjectCategories>>(`project-categories/${id}`)
   },
 
   create(payload: CreateProjectCategory) {
-    return apiClient.post<ApiResponse<ProjectCategories>>(`project-category`, payload)
+    return apiClient.post<ApiResponse<ProjectCategories>>(`project-categories`, payload)
   },
 
   update(id: number, payload: UpdateProjectCategory) {
-    return apiClient.patch(`project-category/${id}`, payload)
+    return apiClient.patch(`project-categories/${id}`, payload)
   },
 
   delete(id: number) {
-    return apiClient.delete(`project-category/${id}`)
+    return apiClient.delete(`project-categories/${id}`)
   },
 }

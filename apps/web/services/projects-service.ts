@@ -2,18 +2,22 @@ import { ApiResponse, Project, ProjectWithMeta } from "@workspace/shared"
 import { apiClient } from "@/lib/axios"
 import { CreateProject, ProjectsFilter, UpdateProject } from "@workspace/validator"
 
-export interface PaginatedProjects {
+export interface ProjectsMeta {
+  total: number
+  page: number
+  limit: number
+}
+
+export interface ProjectsListResponse {
   data: ProjectWithMeta[]
-  meta: {
-    total: number
-    page: number
-    limit: number
-  }
+  meta: ProjectsMeta
 }
 
 export const projectsService = {
-  findAll: async (filter?: ProjectsFilter) => {
-    return apiClient.get<ApiResponse<ProjectWithMeta[]>>("projects", { params: filter })
+  findAll: async (filter?: Partial<ProjectsFilter>) => {
+    return apiClient.get<ApiResponse<ProjectWithMeta[]> & { meta: ProjectsMeta }>("projects", {
+      params: filter,
+    })
   },
 
   findById: async (id: number) => {
@@ -27,7 +31,6 @@ export const projectsService = {
   createWithImages: async (payload: CreateProject, images: File[]) => {
     const formData = new FormData()
 
-    // Append semua field text
     Object.entries(payload).forEach(([key, value]) => {
       if (value === undefined || value === null) return
       if (Array.isArray(value)) {
@@ -37,7 +40,6 @@ export const projectsService = {
       }
     })
 
-    // Append images
     images.forEach((file) => formData.append("images", file))
 
     return apiClient.post<ApiResponse<Project>>("projects/with-images", formData, {

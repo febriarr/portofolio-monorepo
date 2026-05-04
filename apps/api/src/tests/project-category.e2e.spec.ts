@@ -5,7 +5,7 @@ import { db } from "@/config/db"
 import { projectCategory } from "@/config/db/schema"
 import { eq } from "drizzle-orm"
 
-const BASE_URL = "/api/project-category"
+const BASE_URL = "/api/project-categories"
 
 const createdIds: number[] = []
 
@@ -16,9 +16,9 @@ afterAll(async () => {
 })
 
 describe("ProjectCategory E2E", () => {
-  // ─── GET /project-category ────────────────────────────────────────────────
+  // ─── GET /project-categories ────────────────────────────────────────────────
 
-  describe("GET /project-category", () => {
+  describe("GET /project-categories", () => {
     it("should return list of project categories", async () => {
       const res = await request(app).get(BASE_URL)
 
@@ -28,9 +28,9 @@ describe("ProjectCategory E2E", () => {
     })
   })
 
-  // ─── GET /project-category/:id ────────────────────────────────────────────
+  // ─── GET /project-categories/:id ────────────────────────────────────────────
 
-  describe("GET /project-category/:id", () => {
+  describe("GET /project-categories/:id", () => {
     beforeAll(async () => {
       const [created] = await db
         .insert(projectCategory)
@@ -55,9 +55,9 @@ describe("ProjectCategory E2E", () => {
     })
   })
 
-  // ─── PATCH /project-category/:id ─────────────────────────────────────────
+  // ─── PATCH /project-categories/:id ─────────────────────────────────────────
 
-  describe("PATCH /project-category/:id", () => {
+  describe("PATCH /project-categories/:id", () => {
     it("should update a category", async () => {
       const id = createdIds[0]
       const res = await request(app)

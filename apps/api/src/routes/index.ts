@@ -7,7 +7,7 @@ import { techStacksRouter } from "@/modules/tech-stacks/tech-stacks.route"
 const router: Router = Router()
 
 router.use("/projects", projectsRouter)
-router.use("/project-category", projectCategoryRouter)
+router.use("/project-categories", projectCategoryRouter)
 router.use("/tech-category", techCategoryRouter)
 router.use("/tech-stacks", techStacksRouter)
 

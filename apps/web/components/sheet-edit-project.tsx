@@ -54,20 +54,20 @@ export function SheetEditProject({
   })
 
   useEffect(() => {
-    if (project) {
-      reset({
-        title: project.title,
-        shortDescription: project.shortDescription ?? "",
-        description: project.description ?? "",
-        liveUrl: project.liveUrl ?? "",
-        linkRepo: project.linkRepo ?? "",
-        categoryId: project.categoryId ?? undefined,
-        techStackIds: project.techStacks.map((ts) => ts.techStack.id),
-        deletedImagePaths: [],
-      })
-      setNewPreviews([])
-      setDeletedImagePaths([])
-    }
+    if (!project) return
+
+    reset({
+      title: project.title,
+      shortDescription: project.shortDescription ?? "",
+      description: project.description ?? "",
+      liveUrl: project.liveUrl ?? "",
+      linkRepo: project.linkRepo ?? "",
+      categoryId: project.categoryId ?? undefined,
+      techStackIds: project.techStacks?.map((ts) => ts.techStack.id) ?? [],
+      deletedImagePaths: [],
+    })
+    setNewPreviews([])
+    setDeletedImagePaths([])
   }, [project])
 
   useEffect(() => {
@@ -79,7 +79,8 @@ export function SheetEditProject({
   }, [open])
 
   const existingImages =
-    project?.images.filter((img) => img.imageUrl && !deletedImagePaths.includes(img.imageUrl)) ?? []
+    project?.images?.filter((img) => img.imageUrl && !deletedImagePaths.includes(img.imageUrl)) ??
+    []
 
   const totalImages = existingImages.length + newPreviews.length
 

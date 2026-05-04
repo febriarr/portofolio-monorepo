@@ -3,10 +3,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { projectCategory } from "@/services/project-category"
 
 import { CreateProjectCategory, UpdateProjectCategory } from "@workspace/validator"
+import { toast } from "@workspace/ui/components/sonner"
+import { formatApiError, useAlert } from "@/hooks/use-alert"
 
 export const projectCategoryQueryKey = {
-  all: ["project-category"] as const,
-  detail: (id: number) => ["project-category", id] as const,
+  all: ["project-categories"] as const,
+  detail: (id: number) => ["project-categories", id] as const,
 }
 
 export function useProjectCategories() {
@@ -32,6 +34,7 @@ export function useProjectCategory(id: number) {
 
 export function useCreateProjectCategory() {
   const queryClient = useQueryClient()
+  const { hide, alert } = useAlert()
 
   return useMutation({
     mutationFn: async (payload: CreateProjectCategory) => {
@@ -43,12 +46,19 @@ export function useCreateProjectCategory() {
       queryClient.invalidateQueries({
         queryKey: projectCategoryQueryKey.all,
       })
+      hide()
+      toast.success("Create ProjectCategory")
+    },
+    onError: (error) => {
+      const { title, description } = formatApiError(error)
+      alert(title, description)
     },
   })
 }
 
 export function useUpdateProjectCategory() {
   const queryClient = useQueryClient()
+  const { hide, alert } = useAlert()
 
   return useMutation({
     mutationFn: async ({ id, payload }: { id: number; payload: UpdateProjectCategory }) => {
@@ -64,12 +74,20 @@ export function useUpdateProjectCategory() {
       queryClient.invalidateQueries({
         queryKey: projectCategoryQueryKey.detail(variables.id),
       })
+
+      hide()
+      toast.success("Update ProjectCategory")
+    },
+    onError: (error) => {
+      const { title, description } = formatApiError(error)
+      alert(title, description)
     },
   })
 }
 
 export function useDeleteProjectCategory() {
   const queryClient = useQueryClient()
+  const { hide, alert } = useAlert()
 
   return useMutation({
     mutationFn: async (id: number) => {
@@ -81,6 +99,12 @@ export function useDeleteProjectCategory() {
       queryClient.invalidateQueries({
         queryKey: projectCategoryQueryKey.all,
       })
+      hide()
+      toast.success("Delete ProjectCategory")
+    },
+    onError: (error) => {
+      const { title, description } = formatApiError(error)
+      alert(title, description)
     },
   })
 }

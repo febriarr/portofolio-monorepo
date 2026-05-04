@@ -3,6 +3,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { techStacks } from "@/services/tech-stacks"
 
 import { CreateTechStack, UpdateTechStack } from "@workspace/validator"
+import { formatApiError, useAlert } from "@/hooks/use-alert"
+import { toast } from "@workspace/ui/components/sonner"
 
 export const techStacksQueryKey = {
   all: ["tech-stacks"] as const,
@@ -32,6 +34,7 @@ export function useTechStack(id: number) {
 
 export function useCreateTechStack() {
   const queryClient = useQueryClient()
+  const { hide, alert } = useAlert()
 
   return useMutation({
     mutationFn: async (payload: CreateTechStack) => {
@@ -43,12 +46,19 @@ export function useCreateTechStack() {
       queryClient.invalidateQueries({
         queryKey: techStacksQueryKey.all,
       })
+      hide()
+      toast.success("Success create TechStack")
+    },
+    onError: (error) => {
+      const { title, description } = formatApiError(error)
+      alert(title, description)
     },
   })
 }
 
 export function useUpdateTechStack() {
   const queryClient = useQueryClient()
+  const { hide, alert } = useAlert()
 
   return useMutation({
     mutationFn: async ({ id, payload }: { id: number; payload: UpdateTechStack }) => {
@@ -64,12 +74,19 @@ export function useUpdateTechStack() {
       queryClient.invalidateQueries({
         queryKey: techStacksQueryKey.detail(variables.id),
       })
+      hide()
+      toast.success("Success update TechStack")
+    },
+    onError: (error) => {
+      const { title, description } = formatApiError(error)
+      alert(title, description)
     },
   })
 }
 
 export function useDeleteTechStack() {
   const queryClient = useQueryClient()
+  const { hide, alert } = useAlert()
 
   return useMutation({
     mutationFn: async (id: number) => {
@@ -81,6 +98,12 @@ export function useDeleteTechStack() {
       queryClient.invalidateQueries({
         queryKey: techStacksQueryKey.all,
       })
+      hide()
+      toast.success("Success delete TechStack")
+    },
+    onError: (error) => {
+      const { title, description } = formatApiError(error)
+      alert(title, description)
     },
   })
 }

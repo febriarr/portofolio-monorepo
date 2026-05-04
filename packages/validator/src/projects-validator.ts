@@ -20,9 +20,9 @@ export const createProjectSchema = z.object({
   description: z.string().min(5).nullish(),
   liveUrl: z.string().min(5).nullish(),
   linkRepo: z.string().min(5).nullish(),
-  categoryId: z.number().int().positive().nullish(),
+  categoryId: z.coerce.number().int().positive().nullish(),
   images: z.array(createProjectImages).optional(),
-  techStackIds: z.array(z.number().int().positive()).optional(),
+  techStackIds: z.array(z.coerce.number().int().positive()).optional(),
 })
 
 export const updateProjectSchema = createProjectSchema.partial().extend({
@@ -42,6 +42,8 @@ export const projectsFilterSchema = baseFilterSchema.extend({
   search: z.string().optional(),
   categoryId: z.coerce.number().int().positive().optional(),
   techStackId: z.coerce.number().int().positive().optional(),
+  page: z.coerce.number().int().positive().optional(),
+  limit: z.coerce.number().int().positive().default(6).optional(),
 })
 
 // project Images
