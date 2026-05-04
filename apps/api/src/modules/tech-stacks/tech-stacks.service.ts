@@ -5,7 +5,7 @@ import {
   UpdateTechStack,
   updateTechStackSchema,
 } from "@workspace/validator"
-import { TechStack, UploadedFile } from "@workspace/shared"
+import { TechStack, TechStackDetails, UploadedFile } from "@workspace/shared"
 import { techStack } from "@/config/db/schema"
 import { ITechStacksService } from "@/modules/tech-stacks/tech-stacks.interface"
 import { TechStacksRepository } from "@/modules/tech-stacks/tech-stacks.repository"
@@ -17,10 +17,10 @@ export class TechStacksService
   implements ITechStacksService
 {
   constructor(
-    private readonly techStacskRepository: TechStacksRepository,
+    private readonly techStacksRepository: TechStacksRepository,
     private readonly imageService: ImageService
   ) {
-    super(techStacskRepository)
+    super(techStacksRepository)
   }
 
   override async create(payload: CreateTechStack): Promise<TechStack> {
@@ -47,8 +47,8 @@ export class TechStacksService
     return this.create(data)
   }
 
-  override async findById(id: number): Promise<TechStack> {
-    return this.repository.findById(id)
+  override async findById(id: number): Promise<TechStackDetails> {
+    return this.techStacksRepository.findById(id)
   }
 
   async updateWithImage(
@@ -71,7 +71,7 @@ export class TechStacksService
     return this.update(id, data)
   }
 
-  findAll(): Promise<TechStack[]> {
-    return this.techStacskRepository.findAll()
+  findAll(): Promise<TechStackDetails[]> {
+    return this.techStacksRepository.findAll()
   }
 }

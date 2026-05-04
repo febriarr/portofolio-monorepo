@@ -1,5 +1,5 @@
 import { BaseRepository } from "@/shared/base/base.repository"
-import { TechStack } from "@workspace/shared"
+import { TechStack, TechStackDetails } from "@workspace/shared"
 import { CreateTechStack, UpdateTechStack } from "@workspace/validator"
 import { Database } from "@/config/db"
 import { techStack } from "@/config/db/schema"
@@ -15,9 +15,12 @@ export class TechStacksRepository
     super(database, techStack)
   }
 
-  async findById(id: number): Promise<TechStack> {
+  async findById(id: number): Promise<TechStackDetails> {
     const data = await this.database.query.techStack.findFirst({
       where: eq(techStack.id, id),
+      with: {
+        category: true,
+      },
     })
 
     if (!data) {
@@ -27,7 +30,11 @@ export class TechStacksRepository
     return data
   }
 
-  findAll(): Promise<TechStack[]> {
-    return this.database.query.techStack.findMany()
+  findAll(): Promise<TechStackDetails[]> {
+    return this.database.query.techStack.findMany({
+      with: {
+        category: true,
+      },
+    })
   }
 }

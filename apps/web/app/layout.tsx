@@ -1,7 +1,7 @@
 import { Geist, JetBrains_Mono } from "next/font/google"
 
 import "@workspace/ui/globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
+
 import { cn } from "@workspace/ui/lib/utils"
 import ProviderPublic from "@/components/provider-public"
 
@@ -27,11 +27,9 @@ export default function RootLayout({
       className={cn("antialiased", fontSans.variable, "font-mono", jetbrainsMono.variable)}
     >
       <body>
-        <ThemeProvider>
-          <ProviderPublic>
-            <main>{children}</main>
-          </ProviderPublic>
-        </ThemeProvider>
+        <ProviderPublic>
+          <main>{children}</main>
+        </ProviderPublic>
       </body>
     </html>
   )

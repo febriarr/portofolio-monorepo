@@ -12,68 +12,112 @@ import {
 } from "@workspace/ui/components/table"
 import { Button } from "@workspace/ui/components/button"
 import { PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
-import { DialogCreateProjectCategory } from "@/app/dashboard/project-categories/_components/dialog"
+import {
+  AlertDialogDeleteProjectCategory,
+  DialogCreateProjectCategory,
+  SheetEditProjectCategory,
+} from "@/app/dashboard/project-categories/_components/dialog"
+import { formatDate } from "@/lib/utils"
+import { useState } from "react"
+import { ProjectCategories } from "@workspace/shared"
 
 export default function DetailProjectCategory() {
   const { data: categories, isLoading } = useProjectCategories()
+  const [deleted, setDeleted] = useState<boolean>(false)
+  const [selected, setSelected] = useState<ProjectCategories | null>(null)
+  const [update, setUpdate] = useState<boolean>(false)
+
+  const handleDelete = (category: ProjectCategories) => {
+    setDeleted(true)
+    setSelected(category)
+  }
+
+  const handleUpdate = (category: ProjectCategories) => {
+    setUpdate(true)
+    setSelected(category)
+  }
 
   if (isLoading) {
     return <div>Loading</div>
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex w-full items-center justify-between">
-        <div>
-          <TypographyLead>Project Categories</TypographyLead>
-          <TypographySmall>Manage yout Project Categories</TypographySmall>
+    <>
+      <div className="space-y-4">
+        <div className="flex w-full items-center justify-between">
+          <div>
+            <TypographyLead>Project Categories</TypographyLead>
+            <TypographySmall>Manage yout Project Categories</TypographySmall>
+          </div>
+          <DialogCreateProjectCategory />
         </div>
-        <DialogCreateProjectCategory />
-      </div>
 
-      <div className="mt-4">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>no</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Create</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {categories && categories.length === 0 ? (
+        <div className="mt-4">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell className="col-span-4 text-center">No Data</TableCell>
+                <TableHead>no</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Create</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ) : (
-              categories?.map((category, index) => (
-                <TableRow key={category.id}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{category.name}</TableCell>
-                  <TableCell>{formatDate(category.createdAt)}</TableCell>
-                  <TableCell className={"space-x-2"}>
-                    <Button variant="secondary" size="icon" className="cursor-pointer">
-                      <PencilSimpleIcon />
-                    </Button>
-                    <Button variant={"destructive"} size="icon" className="cursor-pointer">
-                      <TrashIcon />
-                    </Button>
-                  </TableCell>
+            </TableHeader>
+            <TableBody>
+              {categories && categories.length === 0 ? (
+                <TableRow>
+                  <TableCell className="col-span-4 text-center">No Data</TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                categories?.map((category, index) => (
+                  <TableRow key={category.id}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell className="capitalize">{category.name}</TableCell>
+                    <TableCell>{formatDate(category.createdAt)}</TableCell>
+                    <TableCell className={"space-x-2"}>
+                      <Button
+                        variant="secondary"
+                        size="icon"
+                        className="cursor-pointer"
+                        onClick={() => handleUpdate(category)}
+                      >
+                        <PencilSimpleIcon />
+                      </Button>
+                      <Button
+                        variant={"destructive"}
+                        size="icon"
+                        className="cursor-pointer"
+                        onClick={() => handleDelete(category)}
+                      >
+                        <TrashIcon />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
-    </div>
-  )
-}
 
-export function formatDate(date: string | Date) {
-  return new Intl.DateTimeFormat("id-ID", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(date))
+      {deleted && selected && (
+        <AlertDialogDeleteProjectCategory
+          category={selected}
+          open={!!selected}
+          onOpenChange={(open) => {
+            if (!open) setSelected(null)
+          }}
+        />
+      )}
+
+      {update && selected && (
+        <SheetEditProjectCategory
+          category={selected}
+          open={!!selected}
+          onOpenChange={(open) => {
+            if (!open) setSelected(null)
+          }}
+        />
+      )}
+    </>
+  )
 }

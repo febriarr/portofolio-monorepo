@@ -10,6 +10,6 @@ export interface TechStack extends TimestampType {
 }
 
 export interface TechStackDetails extends TechStack {
-  category: TechCategory
-  projects: Project[]
+  category: TechCategory | null
+  projects?: Project[]
 }

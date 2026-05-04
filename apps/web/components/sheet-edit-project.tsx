@@ -119,7 +119,7 @@ export function SheetEditProject({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-2xl">
+      <SheetContent className="w-full overflow-y-auto p-4 sm:max-w-2xl">
         <SheetHeader>
           <SheetTitle>Edit Project</SheetTitle>
         </SheetHeader>
@@ -243,7 +243,7 @@ export function SheetEditProject({
                       className="relative aspect-square overflow-hidden rounded-md border"
                     >
                       <Image
-                        src={img.imageUrl!}
+                        src={`${process.env.NEXT_PUBLIC_LINK_R2}/${img.imageUrl!}`}
                         alt="Project image"
                         fill
                         className="object-cover"

@@ -91,7 +91,7 @@ export function DialogCreateProject({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm">
+        <Button size="lg">
           <PlusIcon />
           Add Project
         </Button>

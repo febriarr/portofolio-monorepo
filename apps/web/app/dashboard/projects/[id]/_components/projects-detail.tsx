@@ -21,6 +21,7 @@ import {
   TagIcon,
   StackIcon,
 } from "@phosphor-icons/react"
+import { formatDate } from "@/lib/utils"
 
 interface DetailProjectPageProps {
   projectId: number
@@ -73,7 +74,7 @@ export function DetailProjectPage({
 
   return (
     <>
-      <div className="flex flex-col gap-6 p-4 lg:p-6">
+      <div className="flex flex-col gap-6">
         {/* ── Header ──────────────────────────────────────────────────── */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -117,7 +118,7 @@ export function DetailProjectPage({
             {/* Main Image */}
             {hasImages ? (
               <>
-                <div className="relative aspect-video w-full overflow-hidden rounded-xl border bg-muted">
+                <div className="relative aspect-video w-full overflow-hidden rounded-xs border bg-muted">
                   <Image
                     src={
                       (currentImage &&
@@ -129,7 +130,7 @@ export function DetailProjectPage({
                     className="object-cover transition-all duration-300"
                     priority
                   />
-                  <div className="absolute right-3 bottom-3 rounded-md bg-black/60 px-2 py-1 text-xs text-white backdrop-blur-sm">
+                  <div className="absolute right-3 bottom-3 rounded-xs bg-black/60 px-2 py-1 text-xs text-white backdrop-blur-sm">
                     {activeImage + 1} / {project.images.length}
                   </div>
                 </div>
@@ -141,7 +142,7 @@ export function DetailProjectPage({
                       <button
                         key={img.id}
                         onClick={() => setActiveImage(i)}
-                        className={`relative size-16 shrink-0 overflow-hidden rounded-md border-2 transition-all ${
+                        className={`relative size-16 shrink-0 overflow-hidden rounded-xs border-2 transition-all ${
                           activeImage === i
                             ? "border-primary opacity-100"
                             : "border-transparent opacity-60 hover:opacity-100"
@@ -159,7 +160,7 @@ export function DetailProjectPage({
                 )}
               </>
             ) : (
-              <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-xl border border-dashed bg-muted/30 text-muted-foreground">
+              <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-xs border border-dashed bg-muted/30 text-muted-foreground">
                 <ImageIcon className="size-10 opacity-30" />
                 <p className="text-sm">No images uploaded</p>
                 <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
@@ -170,7 +171,7 @@ export function DetailProjectPage({
 
             {/* Description */}
             {project.description && (
-              <div className="rounded-xl border p-4">
+              <div className="rounded-xs border p-4">
                 <h2 className="mb-2 text-sm font-medium">Description</h2>
                 <p className="text-sm leading-relaxed whitespace-pre-wrap text-muted-foreground">
                   {project.description}
@@ -183,7 +184,7 @@ export function DetailProjectPage({
           <div className="flex flex-col gap-4">
             {/* Links */}
             {(project.liveUrl || project.linkRepo) && (
-              <div className="flex flex-col gap-3 rounded-xl border p-4">
+              <div className="flex flex-col gap-3 rounded-xs border p-4">
                 <h2 className="text-sm font-medium">Links</h2>
                 {project.liveUrl && (
                   <Link
@@ -212,7 +213,7 @@ export function DetailProjectPage({
 
             {/* Tech Stacks */}
             {project.techStacks?.length > 0 && (
-              <div className="flex flex-col gap-3 rounded-xl border p-4">
+              <div className="flex flex-col gap-3 rounded-xs border p-4">
                 <h2 className="flex items-center gap-2 text-sm font-medium">
                   <StackIcon className="size-4" />
                   Tech Stacks
@@ -228,7 +229,7 @@ export function DetailProjectPage({
             )}
 
             {/* Timestamps */}
-            <div className="flex flex-col gap-3 rounded-xl border p-4">
+            <div className="flex flex-col gap-3 rounded-xs border p-4">
               <h2 className="flex items-center gap-2 text-sm font-medium">
                 <CalendarBlankIcon className="size-4" />
                 Timeline
@@ -236,38 +237,26 @@ export function DetailProjectPage({
               <div className="flex flex-col gap-2 text-xs text-muted-foreground">
                 <div className="flex justify-between">
                   <span>Created</span>
-                  <span className="font-mono">
-                    {new Date(project.createdAt).toLocaleDateString("id-ID", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </span>
+                  <span className="font-mono">{formatDate(project.createdAt)}</span>
                 </div>
                 {project.updatedAt && (
                   <div className="flex justify-between">
                     <span>Last updated</span>
-                    <span className="font-mono">
-                      {new Date(project.updatedAt).toLocaleDateString("id-ID", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </span>
+                    <span className="font-mono">{formatDate(project.updatedAt)}</span>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Stats */}
-            <div className="flex flex-col gap-3 rounded-xl border p-4">
+            <div className="flex flex-col gap-3 rounded-xs border p-4">
               <h2 className="text-sm font-medium">Summary</h2>
               <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-lg bg-muted/50 p-3 text-center">
+                <div className="rounded-xs bg-muted/50 p-3 text-center">
                   <p className="text-2xl font-semibold">{project.images?.length}</p>
                   <p className="mt-0.5 text-xs text-muted-foreground">Images</p>
                 </div>
-                <div className="rounded-lg bg-muted/50 p-3 text-center">
+                <div className="rounded-xs bg-muted/50 p-3 text-center">
                   <p className="text-2xl font-semibold">{project.techStacks?.length}</p>
                   <p className="mt-0.5 text-xs text-muted-foreground">Tech Stacks</p>
                 </div>

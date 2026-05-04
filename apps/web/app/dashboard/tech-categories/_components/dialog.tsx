@@ -1,15 +1,5 @@
-import {
-  useCreateProjectCategory,
-  useDeleteProjectCategory,
-  useUpdateProjectCategory,
-} from "@/hooks/use-project-category"
 import { useForm } from "react-hook-form"
-import {
-  CreateProjectCategory,
-  createProjectCategorySchema,
-  UpdateProjectCategory,
-  updateProjectCategorySchema,
-} from "@workspace/validator"
+
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
 import {
@@ -25,7 +15,7 @@ import { Button } from "@workspace/ui/components/button"
 import { PlusIcon } from "@phosphor-icons/react"
 import { Field, FieldError, FieldGroup, FieldLabel } from "@workspace/ui/components/field"
 import { Input } from "@workspace/ui/components/input"
-import { ProjectCategories } from "@workspace/shared"
+
 import {
   AlertDialog,
   AlertDialogContent,
@@ -45,15 +35,27 @@ import {
   SheetClose,
 } from "@workspace/ui/components/sheet"
 import { formatDate } from "@/lib/utils"
+import {
+  CreateTechCategory,
+  createTechCategorySchema,
+  UpdateTechCategory,
+  updateTechCategorySchema,
+} from "@workspace/validator"
+import {
+  useCreateTechCategory,
+  useDeleteTechCategory,
+  useUpdateTechCategory,
+} from "@/hooks/use-tech-category"
+import { TechCategory } from "@workspace/shared"
 
 type DialogProps = {
-  category: ProjectCategories
+  category: TechCategory
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function DialogCreateProjectCategory() {
-  const { mutate, isPending } = useCreateProjectCategory()
+export function DialogCreateTechCategory() {
+  const { mutate, isPending } = useCreateTechCategory()
   const [open, setOpen] = useState<boolean>(false)
 
   const {
@@ -61,14 +63,14 @@ export function DialogCreateProjectCategory() {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<CreateProjectCategory>({
-    resolver: zodResolver(createProjectCategorySchema),
+  } = useForm<CreateTechCategory>({
+    resolver: zodResolver(createTechCategorySchema),
     defaultValues: {
       name: "",
     },
   })
 
-  const onSubmit = (data: CreateProjectCategory) => {
+  const onSubmit = (data: CreateTechCategory) => {
     mutate(data, {
       onSuccess: () => {
         setOpen(false)
@@ -112,8 +114,8 @@ export function DialogCreateProjectCategory() {
   )
 }
 
-export function AlertDialogDeleteProjectCategory({ category, open, onOpenChange }: DialogProps) {
-  const { mutate, isPending } = useDeleteProjectCategory()
+export function AlertDialogDeleteTechCategory({ category, open, onOpenChange }: DialogProps) {
+  const { mutate, isPending } = useDeleteTechCategory()
 
   const handleDelete = () => {
     mutate(category.id, {
@@ -143,16 +145,16 @@ export function AlertDialogDeleteProjectCategory({ category, open, onOpenChange 
   )
 }
 
-export function SheetEditProjectCategory({ category, open, onOpenChange }: DialogProps) {
-  const { mutate, isPending } = useUpdateProjectCategory()
+export function SheetEditTechCategory({ category, open, onOpenChange }: DialogProps) {
+  const { mutate, isPending } = useUpdateTechCategory()
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<UpdateProjectCategory>({
-    resolver: zodResolver(updateProjectCategorySchema),
+  } = useForm<UpdateTechCategory>({
+    resolver: zodResolver(updateTechCategorySchema),
     defaultValues: {
       name: "",
     },
@@ -166,7 +168,7 @@ export function SheetEditProjectCategory({ category, open, onOpenChange }: Dialo
     }
   }, [category, reset])
 
-  const onSubmit = (data: UpdateProjectCategory) => {
+  const onSubmit = (data: UpdateTechCategory) => {
     if (!category) return
 
     mutate(

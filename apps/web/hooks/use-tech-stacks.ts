@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { techStacks } from "@/services/tech-stacks"
 
-import { CreateTechStack, UpdateTechStack } from "@workspace/validator"
 import { formatApiError, useAlert } from "@/hooks/use-alert"
 import { toast } from "@workspace/ui/components/sonner"
 
@@ -37,7 +36,7 @@ export function useCreateTechStack() {
   const { hide, alert } = useAlert()
 
   return useMutation({
-    mutationFn: async (payload: CreateTechStack) => {
+    mutationFn: async (payload: FormData) => {
       const response = await techStacks.create(payload)
       return response.data.data
     },
@@ -61,7 +60,7 @@ export function useUpdateTechStack() {
   const { hide, alert } = useAlert()
 
   return useMutation({
-    mutationFn: async ({ id, payload }: { id: number; payload: UpdateTechStack }) => {
+    mutationFn: async ({ id, payload }: { id: number; payload: FormData }) => {
       const response = await techStacks.update(id, payload)
       return response.data.data
     },

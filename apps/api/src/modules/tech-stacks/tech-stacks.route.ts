@@ -8,7 +8,6 @@ techStacksRouter.get("/", techStacksController.findAll)
 techStacksRouter.get("/:id", techStacksController.findById)
 
 techStacksRouter.post("/create", techStacksController.create)
-techStacksRouter.patch("/:id", techStacksController.update)
 techStacksRouter.post(
   "/create/with-image",
   upload.single("image"),
