@@ -187,9 +187,9 @@ Example:
 
 ```txt
 middlewares/
-├── auth.middleware.ts
-├── error.middleware.ts
-└── validate.middleware.ts
+├── auth.proxy.ts
+├── error.proxy.ts
+└── validate.proxy.ts
 ```
 
 ### Purpose

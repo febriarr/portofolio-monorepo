@@ -1,3 +1,3 @@
-export * from "./projects-validator.js"
-export * from "./tech-stack-validator.js"
-export * from "./auth-validator.js"
+export * from "./projects-validator"
+export * from "./tech-stack-validator"
+export * from "./auth-validator"

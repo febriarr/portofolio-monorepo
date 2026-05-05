@@ -1,4 +1,3 @@
-// apps/api/src/shared/middlewares/authenticate.middleware.ts
 import { Request, Response, NextFunction } from "express"
 import { JwtHelper } from "@/shared/helpers/jwt.helper"
 import { CookieHelper } from "@/shared/helpers/cookie.helper"
