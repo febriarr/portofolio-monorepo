@@ -42,8 +42,6 @@ export const projectsFilterSchema = baseFilterSchema.extend({
   search: z.string().optional(),
   categoryId: z.coerce.number().int().positive().optional(),
   techStackId: z.coerce.number().int().positive().optional(),
-  page: z.coerce.number().int().positive().optional(),
-  limit: z.coerce.number().int().positive().default(6).optional(),
 })
 
 // project Images

@@ -7,7 +7,14 @@ import cors from "cors"
 const app: Express = express()
 app.use(express.json())
 
-app.use(cors())
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+)
 // routes
 app.use("/api", routes)
 // errors

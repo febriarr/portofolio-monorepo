@@ -1,14 +1,15 @@
 import { Router } from "express"
 import { techCategoryController } from "@/modules/tech-category/tech-category.module"
+import { authenticate } from "@/middlewares/authenticate.middleware"
 
 const techCategoryRouter: Router = Router()
 
 techCategoryRouter.get("/", techCategoryController.findAll)
 techCategoryRouter.get("/:id", techCategoryController.findById)
 
-techCategoryRouter.post("/", techCategoryController.create)
-techCategoryRouter.patch("/:id", techCategoryController.update)
+techCategoryRouter.post("/", authenticate, techCategoryController.create)
+techCategoryRouter.patch("/:id", authenticate, techCategoryController.update)
 
-techCategoryRouter.delete("/:id", techCategoryController.delete)
+techCategoryRouter.delete("/:id", authenticate, techCategoryController.delete)
 
 export { techCategoryRouter }

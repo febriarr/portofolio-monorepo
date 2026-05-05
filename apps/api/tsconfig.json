@@ -15,7 +15,8 @@
       "@/*": ["./src/*"]
     },
 
-    "noImplicitOverride": true
+    "noImplicitOverride": true,
+    "typeRoots": ["./src/types", "./node_modules/@types"]
   },
 
   "include": ["src", "drizzle.config.ts", "tsup.config.ts"]

@@ -33,10 +33,10 @@ async function seed() {
   await db
     .insert(projectCategory)
     .values([
-      { name: "Web Development" },
-      { name: "Mobile Development" },
-      { name: "Desktop Application" },
-      { name: "UI/UX Design" },
+      { name: "Frontend" },
+      { name: "Backend" },
+      { name: "Fullstack" },
+      { name: "Mobile Apps" },
       { name: "Open Source" },
     ])
     .onConflictDoNothing()
@@ -47,16 +47,9 @@ async function seed() {
 
   console.log("  → Seeding tech categories...")
 
-  const [frontend, backend, database, devops, mobile, tools] = await db
+  await db
     .insert(techCategory)
-    .values([
-      { name: "Frontend" },
-      { name: "Backend" },
-      { name: "Database" },
-      { name: "DevOps" },
-      { name: "Mobile" },
-      { name: "Tools" },
-    ])
+    .values([{ name: "Frontend" }, { name: "Backend" }, { name: "Database" }, { name: "Tools" }])
     .onConflictDoNothing()
     .returning()
 
@@ -65,48 +58,6 @@ async function seed() {
   // ─── Tech Stacks ──────────────────────────────────────────────────────────
 
   console.log("  → Seeding tech stacks...")
-
-  await db
-    .insert(techStack)
-    .values([
-      // Frontend
-      { name: "React", techCategoryId: frontend?.id },
-      { name: "Next.js", techCategoryId: frontend?.id },
-      { name: "Vue.js", techCategoryId: frontend?.id },
-      { name: "TypeScript", techCategoryId: frontend?.id },
-      { name: "Tailwind CSS", techCategoryId: frontend?.id },
-
-      // Backend
-      { name: "Node.js", techCategoryId: backend?.id },
-      { name: "NestJS", techCategoryId: backend?.id },
-      { name: "Express", techCategoryId: backend?.id },
-      { name: "Go", techCategoryId: backend?.id },
-
-      // Database
-      { name: "PostgreSQL", techCategoryId: database?.id },
-      { name: "MySQL", techCategoryId: database?.id },
-      { name: "MongoDB", techCategoryId: database?.id },
-      { name: "Redis", techCategoryId: database?.id },
-      { name: "Drizzle ORM", techCategoryId: database?.id },
-      { name: "Prisma", techCategoryId: database?.id },
-
-      // DevOps
-      { name: "Docker", techCategoryId: devops?.id },
-      { name: "GitHub Actions", techCategoryId: devops?.id },
-      { name: "Cloudflare", techCategoryId: devops?.id },
-
-      // Mobile
-      { name: "React Native", techCategoryId: mobile?.id },
-      { name: "Expo", techCategoryId: mobile?.id },
-
-      // Tools
-      { name: "Git", techCategoryId: tools?.id },
-      { name: "Figma", techCategoryId: tools?.id },
-      { name: "Turborepo", techCategoryId: tools?.id },
-    ])
-    .onConflictDoNothing()
-
-  console.log("  ✓ Tech stacks seeded")
 
   console.log("\n✅ Seeding complete!")
   process.exit(0)
