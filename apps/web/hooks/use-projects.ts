@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { projectsService } from "@/services/projects-service"
+import { ProjectsMeta, projectsService } from "@/services/projects-service"
 import { CreateProject, ProjectsFilter, UpdateProject } from "@workspace/validator"
 import { formatApiError, useAlert } from "@/hooks/use-alert"
 import { toast } from "@workspace/ui/components/sonner"
+import { ApiResponse, ProjectWithMeta } from "@workspace/shared"
 
 export const PROJECT_KEYS = {
   all: ["projects"] as const,
@@ -13,15 +14,19 @@ export const PROJECT_KEYS = {
 }
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
+type InitialData = ApiResponse<ProjectWithMeta[]> & { meta: ProjectsMeta }
 
-export const useProjects = (filter?: Partial<ProjectsFilter>) => {
+export const useProjects = (
+  filter?: Partial<ProjectsFilter>,
+  options?: { initialData?: InitialData }
+) => {
   return useQuery({
     queryKey: PROJECT_KEYS.list(filter),
     queryFn: async () => {
       const res = await projectsService.findAll(filter)
-      // Response shape: { success, message, data: ProjectWithMeta[], meta: { total, page, limit } }
       return res.data
     },
+    initialData: options?.initialData,
   })
 }
 

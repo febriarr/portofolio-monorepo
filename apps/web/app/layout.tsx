@@ -4,6 +4,8 @@ import "@workspace/ui/globals.css"
 
 import { cn } from "@workspace/ui/lib/utils"
 import ProviderPublic from "@/components/provider-public"
+import { ScrollToTop } from "@/components/scroll-to-top"
+import { Metadata } from "next"
 
 const fontSans = Geist({
   subsets: ["latin"],
@@ -14,6 +16,17 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 })
+
+export const metadata: Metadata = {
+  authors: [
+    {
+      name: "Febri Ardiansyah",
+      url: "https://github.com/febriarr",
+    },
+  ],
+  creator: "Febri Ardiansyah",
+  keywords: ["Febri Ardiansyah", "Portfolio", "Fullstack Developer", "Next.js", "NestJS"],
+}
 
 export default function RootLayout({
   children,
@@ -28,7 +41,8 @@ export default function RootLayout({
     >
       <body>
         <ProviderPublic>
-          <main>{children}</main>
+          {children}
+          <ScrollToTop />
         </ProviderPublic>
       </body>
     </html>

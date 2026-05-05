@@ -1,3 +1,5 @@
+"use client"
+
 import { TechStackDetails } from "@workspace/shared"
 import {
   TypographyH2,
@@ -5,11 +7,31 @@ import {
   TypographyList,
   TypographyP,
 } from "@workspace/ui/components/typography"
-import { TechStacksGrid } from "./tech-stacks-grid"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@workspace/ui/components/tabs"
+import Image from "next/image"
+import { Tooltip, TooltipTrigger, TooltipContent } from "@workspace/ui/components/tooltip"
+
+const CATEGORIES = ["frontend", "backend", "database", "tools"] as const
+type Category = (typeof CATEGORIES)[number]
+
+const CATEGORY_LABELS: Record<Category, string> = {
+  frontend: "Frontend",
+  backend: "Backend",
+  database: "Database",
+  tools: "Tools",
+}
 
 export default function AboutSection({ techStacks }: { techStacks: TechStackDetails[] }) {
+  const grouped = CATEGORIES.reduce<Record<Category, TechStackDetails[]>>(
+    (acc, cat) => {
+      acc[cat] = techStacks.filter((t) => t.category?.name?.toLowerCase() === cat)
+      return acc
+    },
+    { frontend: [], backend: [], database: [], tools: [] }
+  )
+
   return (
-    <section className="h-screen w-full space-y-8 md:space-y-12 lg:space-y-16">
+    <section className="min-h-screen w-full space-y-8 py-16 md:space-y-12 lg:space-y-16" id="about">
       <TypographyH2>About</TypographyH2>
       <div className="grid w-full grid-cols-1 gap-12 md:grid-cols-2 lg:gap-16 xl:gap-24">
         <div className="about">
@@ -86,7 +108,56 @@ export default function AboutSection({ techStacks }: { techStacks: TechStackDeta
           </TypographyList>
         </div>
 
-        {techStacks.length > 0 && <TechStacksGrid techStacks={techStacks} />}
+        <div className="col-span-1 space-y-4 md:col-span-2 md:space-y-8">
+          <TypographyH3 className="text-center">
+            <span className="text-primary">[07]</span> Tech Stack
+          </TypographyH3>
+
+          <Tabs defaultValue="frontend" orientation="horizontal" className="mt-4 flex w-full gap-6">
+            <div className="flex w-full overflow-x-auto overflow-y-hidden md:justify-center">
+              <TabsList>
+                {CATEGORIES.map((cat) => (
+                  <TabsTrigger
+                    key={cat}
+                    value={cat}
+                    className="w-full justify-start rounded-none border-border px-4 text-base data-[state=active]:border-orange-foreground! data-[state=active]:bg-transparent! data-[state=active]:text-orange-foreground! data-[state=active]:shadow-none"
+                  >
+                    {CATEGORY_LABELS[cat]}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </div>
+
+            <div className="w-full md:px-8 lg:px-16">
+              {CATEGORIES.map((cat) => (
+                <TabsContent key={cat} value={cat} className="mt-0 flex w-full justify-center">
+                  {grouped[cat].length === 0 ? (
+                    <TypographyP className="text-sm text-muted-foreground">
+                      No tech stacks in this category.
+                    </TypographyP>
+                  ) : (
+                    <div className="flex flex-wrap gap-4">
+                      {grouped[cat].map((item) => (
+                        <Tooltip key={item.id}>
+                          <TooltipTrigger asChild>
+                            <Image
+                              src={`${process.env.NEXT_PUBLIC_LINK_R2}/${item.logo}`}
+                              alt={item.name}
+                              width={500}
+                              height={500}
+                              className="aspect-square h-16 w-16 object-contain lg:h-24 lg:w-24"
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent className="capitalize">{item.name}</TooltipContent>
+                        </Tooltip>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+              ))}
+            </div>
+          </Tabs>
+        </div>
       </div>
     </section>
   )

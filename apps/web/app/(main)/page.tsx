@@ -2,9 +2,11 @@ import { Metadata } from "next"
 import { TypographyH1, TypographyP } from "@workspace/ui/components/typography"
 import CodeHero from "@/components/code-hero"
 import { Button } from "@workspace/ui/components/button"
-import { getTechStacksSSR } from "@/services/ssr"
+import { getProjects, getTechStacksSSR } from "@/services/ssr"
 
 import AboutSection from "@/components/layouts/about-section"
+import { ProjectsSection } from "@/components/layouts/projects-section"
+import { ContactSection } from "@/components/layouts/contact-section"
 
 export const metadata: Metadata = {
   title: "Home Page Portofolio Febri Ardiansyah",
@@ -12,11 +14,14 @@ export const metadata: Metadata = {
 }
 
 export default async function Page() {
-  const techStacks = await getTechStacksSSR()
+  const [techStacks, projects] = await Promise.all([
+    await getTechStacksSSR(),
+    await getProjects({ page: 1, limit: 6 }),
+  ])
   return (
-    <main className="flex min-h-dvh w-full items-center justify-center">
+    <main className="flex min-h-dvh w-full items-center justify-center py-16">
       {/* Container */}
-      <div className="container flex flex-col gap-12">
+      <div className="container flex flex-col gap-12 divide-y">
         {/* Hero */}
         <section className="flex min-h-[80vh] flex-col items-center justify-center md:flex-row md:items-center md:justify-between md:gap-12">
           {/* Left */}
@@ -48,6 +53,13 @@ export default async function Page() {
 
         {/*  about */}
         <AboutSection techStacks={techStacks} />
+
+        {/*  Projects Section*/}
+
+        <ProjectsSection initialData={projects} />
+
+        {/*  Contact Section */}
+        <ContactSection />
       </div>
     </main>
   )
