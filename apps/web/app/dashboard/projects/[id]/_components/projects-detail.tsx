@@ -42,8 +42,6 @@ export function DetailProjectPage({
   const { data, isLoading, isError } = useProject(projectId)
   const project = data?.data
 
-  // ─── Loading ──────────────────────────────────────────────────────────────
-
   if (isLoading) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
@@ -54,8 +52,6 @@ export function DetailProjectPage({
       </div>
     )
   }
-
-  // ─── Error ────────────────────────────────────────────────────────────────
 
   if (isError || !project) {
     return (
@@ -75,7 +71,6 @@ export function DetailProjectPage({
   return (
     <>
       <div className="flex flex-col gap-6">
-        {/* ── Header ──────────────────────────────────────────────────── */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" className="shrink-0" onClick={() => router.back()}>
@@ -97,7 +92,6 @@ export function DetailProjectPage({
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex shrink-0 items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
               <PencilSimpleIcon />
@@ -113,9 +107,7 @@ export function DetailProjectPage({
         <Separator />
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* ── Left Column: Images ─────────────────────────────────── */}
           <div className="flex flex-col gap-3 lg:col-span-2">
-            {/* Main Image */}
             {hasImages ? (
               <>
                 <div className="relative aspect-video w-full overflow-hidden rounded-xs border bg-muted">
@@ -135,7 +127,6 @@ export function DetailProjectPage({
                   </div>
                 </div>
 
-                {/* Thumbnails */}
                 {project.images.length > 1 && (
                   <div className="flex gap-2 overflow-x-auto pb-1">
                     {project.images.map((img, i) => (
@@ -169,7 +160,6 @@ export function DetailProjectPage({
               </div>
             )}
 
-            {/* Description */}
             {project.description && (
               <div className="rounded-xs border p-4">
                 <h2 className="mb-2 text-sm font-medium">Description</h2>
@@ -180,7 +170,6 @@ export function DetailProjectPage({
             )}
           </div>
 
-          {/* ── Right Column: Meta ──────────────────────────────────── */}
           <div className="flex flex-col gap-4">
             {/* Links */}
             {(project.liveUrl || project.linkRepo) && (
@@ -211,7 +200,6 @@ export function DetailProjectPage({
               </div>
             )}
 
-            {/* Tech Stacks */}
             {project.techStacks?.length > 0 && (
               <div className="flex flex-col gap-3 rounded-xs border p-4">
                 <h2 className="flex items-center gap-2 text-sm font-medium">
@@ -220,7 +208,7 @@ export function DetailProjectPage({
                 </h2>
                 <div className="flex flex-wrap gap-1.5">
                   {project.techStacks.map(({ techStack }) => (
-                    <Badge key={techStack.id} variant="outline" className="text-xs">
+                    <Badge key={techStack.id} variant="destructive" className="text-xs">
                       {techStack.name}
                     </Badge>
                   ))}
@@ -228,7 +216,6 @@ export function DetailProjectPage({
               </div>
             )}
 
-            {/* Timestamps */}
             <div className="flex flex-col gap-3 rounded-xs border p-4">
               <h2 className="flex items-center gap-2 text-sm font-medium">
                 <CalendarBlankIcon className="size-4" />
@@ -266,7 +253,6 @@ export function DetailProjectPage({
         </div>
       </div>
 
-      {/* ── Dialogs ───────────────────────────────────────────────────── */}
       <SheetEditProject
         project={project}
         open={editOpen}

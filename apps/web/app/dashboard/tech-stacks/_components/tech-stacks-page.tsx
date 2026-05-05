@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useTechStacks } from "@/hooks/use-tech-stacks"
 import { TechStackDetails } from "@workspace/shared"
 
@@ -27,7 +27,15 @@ import {
 } from "@phosphor-icons/react"
 import { formatDate } from "@/lib/utils"
 import Image from "next/image"
-import { TypographyMuted, TypographyP, TypographySmall } from "@workspace/ui/components/typography"
+import { TypographyLarge, TypographyMuted, TypographyP } from "@workspace/ui/components/typography"
+import { Input } from "@workspace/ui/components/input"
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@workspace/ui/components/select"
 
 type ViewMode = "table" | "grid"
 
@@ -37,6 +45,29 @@ export default function TechStacksPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("table")
   const [edit, setEdit] = useState<TechStackDetails | null>(null)
   const [deleteItem, setDeleteItem] = useState<TechStackDetails | null>(null)
+  const [search, setSearch] = useState("")
+  const [categoryFilter, setCategoryFilter] = useState<number | "all">("all")
+
+  // Derive unique categories from data
+  const categories = useMemo(() => {
+    if (!data) return []
+    const map = new Map<number, string>()
+    for (const item of data) {
+      if (item.category && item.category.name) {
+        map.set(item.category.id, item.category.name)
+      }
+    }
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name }))
+  }, [data])
+
+  const filtered = useMemo(() => {
+    if (!data) return []
+    return data.filter((item) => {
+      const matchSearch = item.name.toLowerCase().includes(search.toLowerCase())
+      const matchCategory = categoryFilter === "all" || item.category?.id === categoryFilter
+      return matchSearch && matchCategory
+    })
+  }, [data, search, categoryFilter])
 
   return (
     <>
@@ -44,53 +75,77 @@ export default function TechStacksPage() {
         {/* HEADER */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold">Tech Stacks</h1>
+            <TypographyLarge>Tech Stacks</TypographyLarge>
             <p className="text-sm text-muted-foreground">
-              {isLoading ? "Loading..." : `${data?.length ?? 0} items`}
+              {isLoading ? "Loading..." : `${filtered.length} items`}
             </p>
           </div>
 
-          <div className="flex gap-2">
-            {/* VIEW TOGGLE */}
-            <div className="flex rounded-md border">
-              <Button
-                size="icon"
-                variant="ghost"
-                className={viewMode === "table" ? "bg-muted" : ""}
-                onClick={() => setViewMode("table")}
-              >
-                <ListIcon className="size-4" />
-              </Button>
+          {/* CREATE */}
+          <DialogCreateTechStack />
+        </div>
 
-              <Button
-                size="icon"
-                variant="ghost"
-                className={viewMode === "grid" ? "bg-muted" : ""}
-                onClick={() => setViewMode("grid")}
-              >
-                <SquaresFourIcon className="size-4" />
-              </Button>
-            </div>
+        {/* FILTERS */}
+        <div className="flex gap-2">
+          <Input
+            placeholder="Search tech stacks..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="max-w-xs"
+          />
 
-            {/* CREATE */}
-            <DialogCreateTechStack />
+          <Select
+            value={categoryFilter === "all" ? "all" : String(categoryFilter)}
+            onValueChange={(val) => setCategoryFilter(val === "all" ? "all" : Number(val))}
+          >
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="All categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All categories</SelectItem>
+              {categories.map((cat) => (
+                <SelectItem key={cat.id} value={String(cat.id)}>
+                  {cat.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <div className="flex rounded-xs border">
+            <Button
+              size="icon"
+              variant="ghost"
+              className={viewMode === "table" ? "bg-muted" : ""}
+              onClick={() => setViewMode("table")}
+            >
+              <ListIcon className="size-4" />
+            </Button>
+
+            <Button
+              size="icon"
+              variant="ghost"
+              className={viewMode === "grid" ? "bg-muted" : ""}
+              onClick={() => setViewMode("grid")}
+            >
+              <SquaresFourIcon className="size-4" />
+            </Button>
           </div>
         </div>
 
         {/* CONTENT */}
         {isLoading ? (
           <Skeleton viewMode={viewMode} />
-        ) : data?.length === 0 ? (
+        ) : filtered.length === 0 ? (
           <EmptyState />
         ) : viewMode === "table" ? (
           <TableView
-            data={data ?? []}
+            data={filtered}
             onEdit={(item) => setEdit(item)}
             onDelete={(item) => setDeleteItem(item)}
           />
         ) : (
           <GridView
-            data={data ?? []}
+            data={filtered}
             onEdit={(item) => setEdit(item)}
             onDelete={(item) => setDeleteItem(item)}
           />

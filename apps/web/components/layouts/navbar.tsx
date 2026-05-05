@@ -31,7 +31,7 @@ export default function Navbar() {
           <BrainIcon weight={"thin"} size={32} />
           <p className={"text-lg font-medium"}>Febri</p>
         </div>
-        <div className={"flex items-center space-x-10"}>
+        <div className={"hidden items-center space-x-10 md:flex"}>
           <ol className={"flex space-x-10"}>
             {links.map((link) => (
               <li key={link.href} className={"transition-all duration-200 hover:text-primary"}>

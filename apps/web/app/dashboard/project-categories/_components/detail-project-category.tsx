@@ -1,7 +1,7 @@
 "use client"
 
 import { useProjectCategories } from "@/hooks/use-project-category"
-import { TypographyLead, TypographySmall } from "@workspace/ui/components/typography"
+import { TypographyLarge, TypographySmall } from "@workspace/ui/components/typography"
 import {
   Table,
   TableHeader,
@@ -46,7 +46,7 @@ export default function DetailProjectCategory() {
       <div className="space-y-4">
         <div className="flex w-full items-center justify-between">
           <div>
-            <TypographyLead>Project Categories</TypographyLead>
+            <TypographyLarge>Project Categories</TypographyLarge>
             <TypographySmall>Manage yout Project Categories</TypographySmall>
           </div>
           <DialogCreateProjectCategory />

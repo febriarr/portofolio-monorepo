@@ -36,9 +36,17 @@ import {
   ArrowSquareOutIcon,
   ImageIcon,
   FolderOpenIcon,
-  CaretLeftIcon,
-  CaretRightIcon,
 } from "@phosphor-icons/react"
+import {
+  PaginationContent,
+  PaginationItem,
+  PaginationPrevious,
+  PaginationLink,
+  PaginationEllipsis,
+  PaginationNext,
+  Pagination,
+} from "@workspace/ui/components/pagination"
+import { TypographyLarge } from "@workspace/ui/components/typography"
 
 interface ProjectsPageProps {
   categoryOptions?: { id: number; name: string | null }[]
@@ -87,11 +95,10 @@ export function ProjectsPage({ categoryOptions = [], techStackOptions = [] }: Pr
 
   return (
     <>
-      <div className="flex flex-col gap-4 p-4 lg:p-6">
-        {/* ── Header ──────────────────────────────────────────────────── */}
+      <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold">Projects</h1>
+            <TypographyLarge>Projects</TypographyLarge>
             <p className="text-sm text-muted-foreground">
               {isLoading ? "Loading..." : `${total} project${total !== 1 ? "s" : ""}`}
             </p>
@@ -102,7 +109,6 @@ export function ProjectsPage({ categoryOptions = [], techStackOptions = [] }: Pr
           />
         </div>
 
-        {/* ── Toolbar ─────────────────────────────────────────────────── */}
         <div className="flex items-center gap-2">
           <div className="relative max-w-sm flex-1">
             <MagnifyingGlassIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -115,7 +121,7 @@ export function ProjectsPage({ categoryOptions = [], techStackOptions = [] }: Pr
           </div>
 
           {/* View toggle */}
-          <div className="flex rounded-md border">
+          <div className="flex rounded-xs border">
             <Button
               variant="ghost"
               size="icon"
@@ -135,7 +141,6 @@ export function ProjectsPage({ categoryOptions = [], techStackOptions = [] }: Pr
           </div>
         </div>
 
-        {/* ── Content ─────────────────────────────────────────────────── */}
         {isLoading ? (
           <ProjectsSkeleton viewMode={viewMode} />
         ) : projects.length === 0 ? (
@@ -158,7 +163,7 @@ export function ProjectsPage({ categoryOptions = [], techStackOptions = [] }: Pr
 
         {/* ── Pagination ──────────────────────────────────────────────── */}
         {!isLoading && totalPages > 1 && (
-          <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+          <CustomPagination page={page} totalPages={totalPages} onPageChange={setPage} />
         )}
       </div>
 
@@ -179,8 +184,6 @@ export function ProjectsPage({ categoryOptions = [], techStackOptions = [] }: Pr
     </>
   )
 }
-
-// ─── Table View ───────────────────────────────────────────────────────────────
 
 function TableView({
   projects,
@@ -258,12 +261,12 @@ function TableView({
               <TableCell className="hidden lg:table-cell">
                 <div className="flex flex-wrap gap-1">
                   {project.techStacks.slice(0, 3).map(({ techStack }) => (
-                    <Badge key={techStack.id} variant="outline" className="text-xs">
+                    <Badge key={techStack.id} variant="orange" className="text-xs">
                       {techStack.name}
                     </Badge>
                   ))}
                   {project.techStacks.length > 3 && (
-                    <Badge variant="outline" className="text-xs text-muted-foreground">
+                    <Badge variant="orange" className="text-xs">
                       +{project.techStacks.length - 3}
                     </Badge>
                   )}
@@ -315,8 +318,6 @@ function TableView({
   )
 }
 
-// ─── Grid View ────────────────────────────────────────────────────────────────
-
 function GridView({
   projects,
   onCardClick,
@@ -334,7 +335,7 @@ function GridView({
         <div
           key={project.id}
           onClick={() => onCardClick(project.id)}
-          className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl border bg-card transition-shadow hover:shadow-md"
+          className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xs border bg-card transition-shadow hover:shadow-md"
         >
           {/* Cover Image */}
           <div className="relative aspect-video w-full bg-muted">
@@ -412,12 +413,12 @@ function GridView({
                 </Badge>
               )}
               {project.techStacks.slice(0, 3).map(({ techStack }) => (
-                <Badge key={techStack.id} variant="outline" className="text-xs">
+                <Badge key={techStack.id} variant="orange" className="text-xs">
                   {techStack.name}
                 </Badge>
               ))}
               {project.techStacks.length > 3 && (
-                <Badge variant="outline" className="text-xs text-muted-foreground">
+                <Badge variant="orange" className="text-xs text-muted-foreground">
                   +{project.techStacks.length - 3}
                 </Badge>
               )}
@@ -438,8 +439,6 @@ function GridView({
   )
 }
 
-// ─── Empty State ──────────────────────────────────────────────────────────────
-
 function EmptyState({ search }: { search: string }) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-16 text-center">
@@ -456,9 +455,7 @@ function EmptyState({ search }: { search: string }) {
   )
 }
 
-// ─── Pagination ───────────────────────────────────────────────────────────────
-
-function Pagination({
+function CustomPagination({
   page,
   totalPages,
   onPageChange,
@@ -467,7 +464,6 @@ function Pagination({
   totalPages: number
   onPageChange: (page: number) => void
 }) {
-  // Hitung range halaman yang ditampilkan (max 5 page number)
   const getPageNumbers = () => {
     if (totalPages <= 5) {
       return Array.from({ length: totalPages }, (_, i) => i + 1)
@@ -484,72 +480,60 @@ function Pagination({
   const showEndEllipsis = pageNumbers[pageNumbers.length - 1]! < totalPages
 
   return (
-    <div className="flex items-center justify-center gap-1">
-      {/* Prev */}
-      <Button
-        variant="outline"
-        size="icon"
-        className="size-8"
-        disabled={page === 1}
-        onClick={() => onPageChange(page - 1)}
-      >
-        <CaretLeftIcon className="size-4" />
-      </Button>
+    <Pagination>
+      <PaginationContent>
+        {/* Prev */}
+        <PaginationItem>
+          <PaginationPrevious
+            onClick={() => onPageChange(page - 1)}
+            aria-disabled={page === 1}
+            className={page === 1 ? "pointer-events-none opacity-50" : ""}
+          />
+        </PaginationItem>
 
-      {/* First page + ellipsis */}
-      {showStartEllipsis && (
-        <>
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-8 text-xs"
-            onClick={() => onPageChange(1)}
-          >
-            1
-          </Button>
-          <span className="px-1 text-sm text-muted-foreground">...</span>
-        </>
-      )}
+        {/* First page + ellipsis */}
+        {showStartEllipsis && (
+          <>
+            <PaginationItem>
+              <PaginationLink onClick={() => onPageChange(1)}>1</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+          </>
+        )}
 
-      {/* Page numbers */}
-      {pageNumbers.map((p) => (
-        <Button
-          key={p}
-          variant={p === page ? "default" : "outline"}
-          size="icon"
-          className="size-8 text-xs"
-          onClick={() => onPageChange(p)}
-        >
-          {p}
-        </Button>
-      ))}
+        {/* Page numbers */}
+        {pageNumbers.map((p) => (
+          <PaginationItem key={p}>
+            <PaginationLink isActive={p === page} onClick={() => onPageChange(p)}>
+              {p}
+            </PaginationLink>
+          </PaginationItem>
+        ))}
 
-      {/* Last page + ellipsis */}
-      {showEndEllipsis && (
-        <>
-          <span className="px-1 text-sm text-muted-foreground">...</span>
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-8 text-xs"
-            onClick={() => onPageChange(totalPages)}
-          >
-            {totalPages}
-          </Button>
-        </>
-      )}
+        {/* Last page + ellipsis */}
+        {showEndEllipsis && (
+          <>
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink onClick={() => onPageChange(totalPages)}>{totalPages}</PaginationLink>
+            </PaginationItem>
+          </>
+        )}
 
-      {/* Next */}
-      <Button
-        variant="outline"
-        size="icon"
-        className="size-8"
-        disabled={page === totalPages}
-        onClick={() => onPageChange(page + 1)}
-      >
-        <CaretRightIcon className="size-4" />
-      </Button>
-    </div>
+        {/* Next */}
+        <PaginationItem>
+          <PaginationNext
+            onClick={() => onPageChange(page + 1)}
+            aria-disabled={page === totalPages}
+            className={page === totalPages ? "pointer-events-none opacity-50" : ""}
+          />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
   )
 }
 

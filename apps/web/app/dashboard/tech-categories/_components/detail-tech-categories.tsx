@@ -1,6 +1,6 @@
 "use client"
 
-import { TypographyLead, TypographySmall } from "@workspace/ui/components/typography"
+import { TypographyLarge, TypographySmall } from "@workspace/ui/components/typography"
 import {
   Table,
   TableHeader,
@@ -46,7 +46,7 @@ export default function DetailTechCategories() {
       <div className="space-y-4">
         <div className="flex w-full items-center justify-between">
           <div>
-            <TypographyLead>Tech Categories</TypographyLead>
+            <TypographyLarge>Tech Categories</TypographyLarge>
             <TypographySmall>Manage yout Tech Categories</TypographySmall>
           </div>
           <DialogCreateTechCategory />
