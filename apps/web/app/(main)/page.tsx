@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   description: "Welcome to my Personal Portofolio, Febri Ardiansyah",
 }
 
+export const dynamic = "force-dynamic"
+
 export default async function Page() {
   const [techStacks, projects] = await Promise.all([
     await getTechStacksSSR(),

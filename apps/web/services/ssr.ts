@@ -2,7 +2,7 @@ import { ApiResponse, ProjectWithMeta, TechStackDetails } from "@workspace/share
 import { ProjectsMeta } from "@/services/projects-service"
 
 export async function getTechStacksSSR(): Promise<TechStackDetails[]> {
-  const res = await fetch("http://localhost:8000/api/tech-stacks", {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL!}/tech-stacks`, {
     next: {
       revalidate: 60 * 60 * 3,
     },
