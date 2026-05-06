@@ -20,7 +20,7 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: "/api/path:*",
+        source: "/api/:path*",
         destination: "https://portofolio-monorepo-production.up.railway.app",
       },
     ]
