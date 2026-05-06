@@ -21,7 +21,7 @@ const nextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "https://portofolio-monorepo-production.up.railway.app",
+        destination: "https://portofolio-monorepo-production.up.railway.app/api/:path*",
       },
     ]
   },
