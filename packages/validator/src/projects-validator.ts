@@ -16,10 +16,10 @@ export const updateProjectCategorySchema = createProjectCategorySchema.partial()
 
 export const createProjectSchema = z.object({
   title: z.string(),
-  shortDescription: z.string().min(5).nullish(),
-  description: z.string().min(5).nullish(),
-  liveUrl: z.string().min(5).nullish(),
-  linkRepo: z.string().min(5).nullish(),
+  shortDescription: z.string().min(5).nullish().optional(),
+  description: z.string().min(5).nullish().optional(),
+  liveUrl: z.string().min(5).nullish().optional(),
+  linkRepo: z.string().min(5).nullish().optional(),
   categoryId: z.coerce.number().int().positive().nullish(),
   images: z.array(createProjectImages).optional(),
   techStackIds: z.array(z.coerce.number().int().positive()).optional(),
