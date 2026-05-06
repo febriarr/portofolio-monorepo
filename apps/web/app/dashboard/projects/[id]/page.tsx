@@ -1,6 +1,11 @@
 import { DetailProjectPage } from "@/app/dashboard/projects/[id]/_components/projects-detail"
+import { Metadata } from "next"
 
 export const dynamic = "force-dynamic"
+
+export const metadata: Metadata = {
+  title: "Projects Detail",
+}
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
