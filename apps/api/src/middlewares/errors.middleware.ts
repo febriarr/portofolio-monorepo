@@ -30,7 +30,7 @@ export const errorsMiddleware = (
   }
 
   if (error instanceof Error) {
-    logger.error(error.message, { stack: error.stack })
+    logger.error(error)
   } else {
     logger.error("Unknown error", { error })
   }
