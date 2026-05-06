@@ -11,10 +11,11 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@workspace/ui/componen
 import Image from "next/image"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@workspace/ui/components/tooltip"
 
-const CATEGORIES = ["frontend", "backend", "database", "tools"] as const
+const CATEGORIES = ["frontend", "backend", "database", "tools", "language"] as const
 type Category = (typeof CATEGORIES)[number]
 
 const CATEGORY_LABELS: Record<Category, string> = {
+  language: "Language",
   frontend: "Frontend",
   backend: "Backend",
   database: "Database",
@@ -27,7 +28,7 @@ export default function AboutSection({ techStacks }: { techStacks: TechStackDeta
       acc[cat] = techStacks.filter((t) => t.category?.name?.toLowerCase() === cat)
       return acc
     },
-    { frontend: [], backend: [], database: [], tools: [] }
+    { language: [], frontend: [], backend: [], database: [], tools: [] }
   )
 
   return (

@@ -18,7 +18,7 @@ import { ArrowSquareInIcon, ImageIcon } from "@phosphor-icons/react"
 import { ProjectsMeta } from "@/services/projects-service"
 import { TypographyH2, TypographyLead } from "@workspace/ui/components/typography"
 import Link from "next/link"
-import { formatDate } from "@/lib/utils"
+import { formatDate, truncate } from "@/lib/utils"
 
 type InitialData = ApiResponse<ProjectWithMeta[]> & { meta: ProjectsMeta }
 
@@ -95,7 +95,7 @@ function ProjectCard({ project }: { project: ProjectWithMeta }) {
           <p className="truncate leading-tight font-medium">{project.title}</p>
           <div className="h-8">
             {project.shortDescription && (
-              <p className="line-clamp-2 text-xs">{project.shortDescription}</p>
+              <p className="line-clamp-2 text-xs"> {truncate(project.shortDescription, 50)}</p>
             )}
           </div>
 

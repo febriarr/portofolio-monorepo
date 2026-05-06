@@ -47,6 +47,7 @@ import {
   Pagination,
 } from "@workspace/ui/components/pagination"
 import { TypographyLarge } from "@workspace/ui/components/typography"
+import { truncate } from "@/lib/utils"
 
 interface ProjectsPageProps {
   categoryOptions?: { id: number; name: string | null }[]
@@ -237,10 +238,15 @@ function TableView({
               {/* Title */}
               <TableCell>
                 <div>
-                  <p className="leading-tight font-medium">{project.title}</p>
+                  <p
+                    className="line-clamp-1 truncate leading-tight font-medium"
+                    title={project.title}
+                  >
+                    {project.title}
+                  </p>
                   {project.shortDescription && (
                     <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
-                      {project.shortDescription}
+                      {truncate(project.shortDescription, 50)}
                     </p>
                   )}
                 </div>
@@ -368,7 +374,7 @@ function GridView({
                 <p className="truncate leading-tight font-medium">{project.title}</p>
                 {project.shortDescription && (
                   <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-                    {project.shortDescription}
+                    {truncate(project.shortDescription, 50)}
                   </p>
                 )}
               </div>
