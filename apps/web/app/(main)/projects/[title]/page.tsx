@@ -22,7 +22,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     }
 
   const ogImage = project.images?.[0]
-    ? `${process.env.NEXT_PUBLIC_LINK_R2}/${project.images[0]}`
+    ? `${process.env.NEXT_PUBLIC_LINK_R2}/${project.images[0].imageUrl}`
     : undefined
 
   return {
