@@ -119,7 +119,10 @@ function ProjectCard({ project }: { project: ProjectWithMeta }) {
             </div>
           </div>
 
-          <p className="text-xs text-muted-foreground">{formatDate(project.createdAt)}</p>
+          <div className="flex w-full items-center justify-between">
+            <p className="text-xs text-muted-foreground">{formatDate(project.createdAt)}</p>
+            <ArrowSquareInIcon className="size-4" />
+          </div>
         </div>
       </div>
     </Link>
