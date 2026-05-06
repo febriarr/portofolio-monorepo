@@ -1,11 +1,9 @@
 import axios, { AxiosError, AxiosInstance } from "axios"
 import { ApiResponse } from "@workspace/shared"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"
-
 // Create axios instance
 export const apiClient: AxiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: "/api",
   timeout: 10000,
   withCredentials: true,
 })
