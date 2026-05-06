@@ -10,7 +10,6 @@ export const errorsMiddleware = (
   res: Response,
   _next: NextFunction
 ) => {
-  console.error(error)
   if (error instanceof BaseError) {
     logger.warn(`${error.statusCode} - ${error.message}`)
     return res.status(error.statusCode).json(error.getErrorResponse())
