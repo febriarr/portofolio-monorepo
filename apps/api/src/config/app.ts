@@ -3,8 +3,12 @@ import { notFoundMiddleware } from "@/middlewares/not-found.middleware"
 import { errorsMiddleware } from "@/middlewares/errors.middleware"
 import routes from "../routes/index"
 import cors from "cors"
+import { httpLogger } from "@/middlewares/http-logger.middleware"
 
 const app: Express = express()
+
+app.use(httpLogger)
+
 app.use(express.json())
 
 app.use(

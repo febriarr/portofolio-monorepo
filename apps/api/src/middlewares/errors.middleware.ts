@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from "express"
 import { ZodError } from "zod"
 import { BaseError } from "@/shared/errors/custom-error"
 import { ErrorResponseType } from "@workspace/shared"
+import { logger } from "@/config/logger"
 
 export const errorsMiddleware = (
   error: unknown,
@@ -10,6 +11,7 @@ export const errorsMiddleware = (
   _next: NextFunction
 ) => {
   if (error instanceof BaseError) {
+    logger.warn(`${error.statusCode} - ${error.message}`)
     return res.status(error.statusCode).json(error.getErrorResponse())
   }
 
@@ -23,10 +25,15 @@ export const errorsMiddleware = (
       details: error.flatten(),
       statusCode: 400,
     }
+    logger.warn(`Validation error: ${response.message}`)
     return res.status(400).json(response)
   }
 
-  console.error(error)
+  if (error instanceof Error) {
+    logger.error(error.message, { stack: error.stack })
+  } else {
+    logger.error("Unknown error", { error })
+  }
 
   const response: ErrorResponseType = {
     code: "INTERNAL_SERVER_ERROR",
