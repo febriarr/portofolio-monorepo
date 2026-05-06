@@ -77,40 +77,44 @@ export class ImageService {
   }
 
   async createImage(input: CreateImageInput): Promise<ImageResult> {
-    const parsed = createImageSchema.parse(input)
-    const { file } = parsed
-    const options = this.withDefaultOptions(parsed.options)
+    try {
+      const parsed = createImageSchema.parse(input)
+      const { file } = parsed
+      const options = this.withDefaultOptions(parsed.options)
 
-    if (!options.allowedMimeTypes?.includes(file.mimetype)) {
-      throw new ConflictError("Unsupported file type")
-    }
+      if (!options.allowedMimeTypes?.includes(file.mimetype)) {
+        throw new ConflictError("Unsupported file type")
+      }
 
-    if (options.maxBytes && file.size > options.maxBytes) {
-      throw new ConflictError("File size too large")
-    }
+      if (options.maxBytes && file.size > options.maxBytes) {
+        throw new ConflictError("File size too large")
+      }
 
-    const { buffer, mimeType, ext } = await this.processImage(file)
+      const { buffer, mimeType, ext } = await this.processImage(file)
 
-    const fileName = this.generateUniqueFileName(ext)
-    const key = `${options.prefix}${fileName}`
+      const fileName = this.generateUniqueFileName(ext)
+      const key = `${options.prefix}${fileName}`
 
-    await this.r2Client.send(
-      new PutObjectCommand({
-        Bucket: options.bucket,
-        Key: key,
-        Body: buffer,
-        ContentType: mimeType,
-        CacheControl: "public, max-age=31536000, immutable",
-      })
-    )
+      await this.r2Client.send(
+        new PutObjectCommand({
+          Bucket: options.bucket,
+          Key: key,
+          Body: buffer,
+          ContentType: mimeType,
+          CacheControl: "public, max-age=31536000, immutable",
+        })
+      )
 
-    return {
-      path: key,
-      meta: {
-        fileName,
-        mimeType: mimeType,
-        size: buffer.length,
-      },
+      return {
+        path: key,
+        meta: {
+          fileName,
+          mimeType: mimeType,
+          size: buffer.length,
+        },
+      }
+    } catch (error) {
+      throw error
     }
   }
 

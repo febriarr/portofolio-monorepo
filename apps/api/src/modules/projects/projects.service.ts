@@ -57,14 +57,18 @@ export class ProjectsService
   }
 
   async createWithImages(payload: CreateProject, images?: UploadedFile[]): Promise<Project> {
-    const data = createProjectSchema.parse(payload)
+    try {
+      const data = createProjectSchema.parse(payload)
 
-    if (images?.length) {
-      const uploaded = await this.imageService.createImages(images.map((file) => ({ file })))
-      data.images = uploaded.map((img) => ({ imageUrl: img.path }))
+      if (images?.length) {
+        const uploaded = await this.imageService.createImages(images.map((file) => ({ file })))
+        data.images = uploaded.map((img) => ({ imageUrl: img.path }))
+      }
+
+      return this.repository.create(data)
+    } catch (error) {
+      throw error
     }
-
-    return this.repository.create(data)
   }
 
   async updateWithImages(
