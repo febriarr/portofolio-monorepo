@@ -4,7 +4,7 @@ import { ApiResponse } from "@workspace/shared"
 // Create axios instance
 export const apiClient: AxiosInstance = axios.create({
   baseURL: "/api",
-  timeout: 10000,
+  timeout: 30000,
   withCredentials: true,
 })
 
