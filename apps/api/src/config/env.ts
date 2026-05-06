@@ -11,6 +11,8 @@ const envSchema = z.object({
 
   DATABASE_URL: z.string().min(1),
 
+  DATABASE_DIRECT_URL: z.string().min(1),
+
   R2_BUCKET_NAME: z.string().min(1),
 
   R2_ENDPOINT_URL: z.string().min(1),
