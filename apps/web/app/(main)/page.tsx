@@ -33,7 +33,7 @@ export default async function Page() {
             </TypographyH1>
 
             <TypographyP className="mt-4 text-muted-foreground">
-              <span className="block text-sm">From Operations to Fullstack Developer</span>
+              <span>From Operations to Fullstack Developer</span>
               <span className="mt-2 block max-w-md">
                 I build digital solutions with a structured and practical approach
               </span>

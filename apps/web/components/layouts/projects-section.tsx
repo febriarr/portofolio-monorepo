@@ -46,7 +46,7 @@ export function ProjectsSection({ initialData }: { initialData: InitialData }) {
       {isLoading ? (
         <ProjectsGridSkeleton />
       ) : (
-        <div className="grid grid-cols-2 gap-4 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
           {projects.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}
