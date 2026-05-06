@@ -9,7 +9,21 @@ const nextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "cdn.febriardiansyah.my.id",
+        port: "",
+        pathname: "/**",
+      },
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/api/path:*",
+        destination: "https://portofolio-monorepo-production.up.railway.app",
+      },
+    ]
   },
 }
 
