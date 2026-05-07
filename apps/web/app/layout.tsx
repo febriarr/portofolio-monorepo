@@ -18,7 +18,7 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://febriardiansyah.my.id"),
+  metadataBase: new URL("https://www.febriardiansyah.my.id"),
   title: {
     default: "Febri Ardiansyah - Fullstack Developer",
     template: "%s | Febri Ardiansyah",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "id_ID",
-    url: "https://febriardiansyah.my.id",
+    url: "https://www.febriardiansyah.my.id",
     siteName: "Febri Ardiansyah Portfolio",
   },
 
@@ -42,6 +42,10 @@ export const metadata: Metadata = {
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
     ],
     apple: "/apple-touch-icon.png",
+  },
+
+  verification: {
+    google: "svxHf-QT4HuW6mHAl4Tjtxo2i7h2eMbv5SRNZQLk4R0",
   },
 }
 
