@@ -16,3 +16,15 @@ export const useLogin = () => {
     },
   })
 }
+
+export const useLogout = () => {
+  const router = useRouter()
+
+  return useMutation({
+    mutationFn: authService.logout,
+    onSuccess: () => {
+      router.push("/login")
+      router.refresh()
+    },
+  })
+}
