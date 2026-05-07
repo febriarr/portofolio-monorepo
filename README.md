@@ -45,7 +45,7 @@ monorepo-portofolio/
 - Winston for logging
 
 **Frontend**
-- Next.js 14 App Router
+- Next.js 16 App Router
 - TanStack Query
 - React Hook Form + Zod
 - Shadcn UI + Tailwind CSS
