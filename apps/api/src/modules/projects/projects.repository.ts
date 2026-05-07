@@ -84,25 +84,19 @@ export class ProjectsRepository
     const { page = 1, limit = 6, search, categoryId, techStackId } = filter ?? {}
     const offset = (page - 1) * limit
 
-    let techStackProjectIds: number[] | undefined
+    const conditions: SQL[] = []
+
+    QueryHelper.pushIfExists(conditions, search ? ilike(projects.title, `%${search}%`) : null)
+    QueryHelper.pushIfExists(conditions, categoryId ? eq(projects.categoryId, categoryId) : null)
 
     if (techStackId) {
-      const rows = await this.database
+      const subquery = this.database
         .select({ projectId: projectTechStacks.projectId })
         .from(projectTechStacks)
         .where(eq(projectTechStacks.techStackId, techStackId))
 
-      techStackProjectIds = rows.map((r) => r.projectId)
-      if (!techStackProjectIds.length) return { data: [], total: 0 }
+      QueryHelper.pushIfExists(conditions, inArray(projects.id, subquery))
     }
-
-    const conditions: SQL[] = []
-    QueryHelper.pushIfExists(conditions, search ? ilike(projects.title, `%${search}%`) : null)
-    QueryHelper.pushIfExists(conditions, categoryId ? eq(projects.categoryId, categoryId) : null)
-    QueryHelper.pushIfExists(
-      conditions,
-      techStackProjectIds ? inArray(projects.id, techStackProjectIds) : null
-    )
 
     const where = QueryHelper.combineConditions(conditions)
 

@@ -124,15 +124,13 @@ export class ImageService {
       throw new ConflictError("Too many files. Max 10 allowed")
     }
 
-    const created: ImageResult[] = []
+    let created: ImageResult[] = []
 
     try {
-      for (const input of inputs) {
-        const img = await this.createImage(input)
-        created.push(img)
-      }
+      created = await Promise.all(inputs.map((input) => this.createImage(input)))
       return created
     } catch (err) {
+      // Rollback semua yang sudah terupload
       await this.deleteImages(created.map((i) => i.path))
       throw err
     }
