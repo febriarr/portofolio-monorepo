@@ -1,249 +1,166 @@
 # Monorepo Portfolio
 
-A modern fullstack monorepo project built with a scalable and maintainable architecture using TypeScript across the entire stack.
+This is my personal portfolio project, built primarily to learn and implement several concepts I've been wanting to explore — especially OOP, Turborepo, and Separation of Concerns.
 
-The purpose of this repository is not only to build features, but also to apply real-world engineering practices such as modular architecture, shared contracts, dependency injection, reusable tooling configuration, and type-safe development.
-
----
-
-# Tech Stack
-
-## Frontend
-
-* Next.js
-* React
-* TypeScript
-* App Router
-* shadcn/ui
+It might look over-engineered for a portfolio. Honestly, it kind of is. But that's the whole point — I wanted to experience what it feels like to build something with a more structured architecture, not just make features work.
 
 ---
 
-## Backend
+## Project Structure
 
-* Express
-* Drizzle ORM
-* PostgreSQL
-* OOP Architecture
-* Repository Pattern
-* Dependency Injection
-
----
-
-## Shared Tooling
-
-* Turborepo
-* TypeScript
-* Zod
-* ESLint
-* Prettier
-* pnpm workspace
-
----
-
-# Repository Structure
-
-```txt
-.
-├── apps
-│   ├── api
-│   └── web
-│
-├── packages
-│   ├── eslint-config
-│   ├── shared
-│   ├── typescript-config
-│   ├── ui
-│   └── validator
-│
-├── .eslintrc.js
-├── .gitignore
-├── .npmrc
-├── .prettierignore
-├── .prettierrc
-├── LICENSE
-├── package.json
-├── pnpm-lock.yaml
-├── pnpm-workspace.yaml
-├── README.md
-├── tsconfig.json
-└── turbo.json
+```
+monorepo-portofolio/
+├── apps/
+│   ├── api/                    # REST API (Express + TypeScript)
+│   │   └── src/
+│   │       ├── config/         # Database, environment
+│   │       ├── middlewares/    # Global middlewares
+│   │       ├── modules/        # Feature modules (auth, projects, etc)
+│   │       ├── routes/         # Route definitions
+│   │       ├── shared/         # Base classes, helpers, errors
+│   │       └── types/          # Express type extensions
+│   └── web/                    # Frontend (Next.js App Router)
+│       ├── app/                # Pages
+│       ├── components/         # UI components
+│       ├── hooks/              # Custom hooks
+│       ├── lib/                # Axios client, utilities
+│       └── services/           # API service functions
+└── packages/
+    ├── shared/                 # Shared types & interfaces
+    ├── validator/              # Zod schemas
+    ├── ui/                     # Shadcn UI components
+    ├── eslint-config/          # Shared ESLint config
+    └── typescript-config/      # Shared TypeScript config
 ```
 
 ---
 
-# Applications
+## Tech Stack
 
-## `apps/api`
+**Backend**
+- Express.js + TypeScript
+- Drizzle ORM + PostgreSQL (Supabase)
+- JWT Authentication (Access Token + Refresh Token)
+- Cloudflare R2 for file storage
+- Winston for logging
 
-Backend API application.
+**Frontend**
+- Next.js 14 App Router
+- TanStack Query
+- React Hook Form + Zod
+- Shadcn UI + Tailwind CSS
+- Axios
 
-Built using Express and structured with a layered architecture to keep responsibilities separated and maintainable.
+**Monorepo**
+- Turborepo
+- pnpm workspaces
 
-### Main Concepts
+---
 
-* Modular feature-based structure
-* OOP approach
-* Manual dependency injection
-* Repository pattern
-* Centralized error handling
-* Shared validation contracts
-* Typed environment configuration
+## Why Repository Pattern?
 
-### Architecture Flow
+If you're reading this code and wondering why a portfolio needs `BaseRepository`, `BaseService`, and all sorts of abstractions — fair question.
 
-```txt
-Request
-  ↓
-Route
-  ↓
-Controller
-  ↓
-Service
-  ↓
-Repository
-  ↓
-Database
+The reason is simple: I wanted to learn how to separate responsibilities at each layer consistently.
+
+- **Repository layer** only deals with the database — queries, inserts, updates, deletes
+- **Service layer** only deals with business logic — validation, data transformation, side effects
+- **Controller layer** only deals with HTTP — receive requests, send responses
+
+This way each layer can evolve independently. If I ever want to swap the ORM or database, I only need to change the repository without touching the service or controller.
+
+---
+
+## OOP Implementation
+
+This project consistently applies the 4 pillars of OOP:
+
+**Encapsulation** — every dependency is injected through the constructor and marked `private` or `protected`, no direct access from outside the class.
+
+**Inheritance** — `ProjectsRepository` extends `BaseRepository`, `ProjectsService` extends `BaseService`. Common logic like `create`, `update`, `delete` is written once in the base class.
+
+**Polymorphism** — each module can override base methods as needed. `findAll` in `ProjectsService` returns `PaginatedResult`, while `ProjectCategoryService` returns a plain array — both are valid because each has its own contract.
+
+**Abstraction** — `BaseRepository` and `BaseService` are abstract classes that can't be instantiated directly. `findById` and `findAll` must be implemented in subclasses because each entity has different query requirements.
+
+---
+
+## Running the Project
+
+**Prerequisites**
+- Node.js 20+
+- pnpm 9+
+
+**Install dependencies**
+```bash
+pnpm install
+```
+
+**Setup environment**
+
+Copy the example env files and fill in the values:
+```bash
+cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env
+```
+
+`apps/api/.env`
+```bash
+DATABASE_URL=url-db
+DATABASE_DIRECT_URL=url-db
+PORT=8000
+NODE_ENV=development-or-production
+
+R2_ACCESS_KEY=access-storage
+R2_SECRET_ACCESS_KEY=access-key-storage
+R2_ENDPOINT_URL=endpoint
+R2_BUCKET_NAME=bucket
+
+JWT_ACCESS_SECRET=random-string-32
+JWT_REFRESH_SECRET=random-string-32
+
+CLIENT_URL=url-frontend
+DOMAIN=domain-for-cookie
+```
+
+`apps/web/.env`
+```bash
+NEXT_PUBLIC_LINK_R2=public-url-platform-storage
+
+# If using Next.js proxy/rewrites (default setup):
+NEXT_PUBLIC_API_URL=/api
+
+# If not using rewrites, set the backend URL directly
+# (must be on the same domain as the frontend):
+# NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+```
+
+**Database migration & seed**
+```bash
+pnpm --filter @monorepo/api db:migrate
+pnpm --filter @monorepo/api db:seed
+```
+
+**Run all apps**
+```bash
+pnpm dev
 ```
 
 ---
 
-## `apps/web`
+## Deployment
 
-Frontend application built with Next.js.
-
-Consumes shared validators, shared contracts, and shared UI components from the workspace packages to keep frontend and backend synchronized.
-
----
-
-# Workspace Packages
-
-## `packages/eslint-config`
-
-Shared ESLint configuration used across the entire monorepo.
-
-This keeps lint rules centralized and consistent between applications and packages.
+- **Frontend** — Vercel
+- **Backend** — Railway
+- **Database** — Supabase
+- **File Storage** — Cloudflare R2
 
 ---
 
-## `packages/typescript-config`
+## Notes
 
-Shared TypeScript configuration.
+This project is still under active development. Some things I still want to add:
 
-Provides reusable compiler settings and keeps TypeScript behavior consistent across all workspaces.
-
----
-
-## `packages/shared`
-
-Contains reusable shared types and constants used by both frontend and backend.
-
-Examples:
-
-* API response types
-* error response types
-* pagination metadata
-* utility types
-* shared constants
-
-This package acts as a shared contract layer between applications.
-
----
-
-## `packages/validator`
-
-Shared validation schemas built with Zod.
-
-The frontend and backend both consume the same schemas and inferred types to avoid duplicated validation logic and inconsistent DTO definitions.
-
-### Benefits
-
-* single source of truth
-* shared DTO inference
-* runtime validation
-* end-to-end type safety
-
----
-
-## `packages/ui`
-
-Shared UI components used by the frontend application.
-
-Built using shadcn/ui and intended to keep the design system reusable and consistent.
-
----
-
-# Monorepo Approach
-
-This repository follows a workspace-based architecture where applications and reusable packages are separated by responsibility.
-
-The goal of this structure is to improve:
-
-* maintainability
-* scalability
-* code reuse
-* consistency
-* developer experience
-
----
-
-# Shared Contract Philosophy
-
-Instead of duplicating types between frontend and backend, shared contracts are extracted into dedicated packages.
-
-Example flow:
-
-```txt
-packages/validator
-        ↓
-schema + inferred types
-        ↓
-apps/api + apps/web
-```
-
-and:
-
-```txt
-packages/shared
-        ↓
-shared response contracts
-        ↓
-apps/api + apps/web
-```
-
-This keeps the fullstack application synchronized while reducing duplicated logic.
-
----
-
-# Development Philosophy
-
-This project intentionally focuses on engineering quality and maintainable architecture rather than only implementing features.
-
-Some principles applied in this repository:
-
-* separation of concerns
-* reusable abstractions
-* centralized configuration
-* consistent structure
-* type-safe development
-* modular architecture
-* explicit responsibility boundaries
-
----
-
-# Goals
-
-The purpose of this repository is to explore and implement modern fullstack architecture patterns using a monorepo approach.
-
-It also serves as a personal portfolio project to demonstrate:
-
-* scalable project organization
-* backend architecture design
-* shared contract architecture
-* reusable tooling configuration
-* modern TypeScript development workflow
-
----
-
-# License
-
-MIT
+- Unit testing for the base classes
+- Rate limiting
+- API documentation with Swagger
