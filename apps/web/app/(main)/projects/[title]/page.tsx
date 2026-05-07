@@ -29,6 +29,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     title: project.title,
     description: project.shortDescription,
     openGraph: {
+      type: "article",
       title: project.title,
       description: project.shortDescription ?? undefined,
       images: ogImage ? [{ url: ogImage }] : [],

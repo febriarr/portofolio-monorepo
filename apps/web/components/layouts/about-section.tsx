@@ -93,7 +93,7 @@ export default function AboutSection({ techStacks }: { techStacks: TechStackDeta
           </TypographyH3>
           <TypographyP>Right now I:</TypographyP>
           <TypographyList>
-            <li>Work in operations</li>
+            <li>Work in Operations Warehouse</li>
             <li>Build personal projects in web development</li>
           </TypographyList>
         </div>

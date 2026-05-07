@@ -1,0 +1,28 @@
+# Febri Ardiansyah
+
+> Fullstack Developer based in Banyuwangi, East Java, Indonesia.
+> Currently working in operations while actively building web projects.
+
+## About
+Febri Ardiansyah is a self-taught fullstack developer with a background in warehouse operations at PT Suri Tani Pemuka. His operational experience shaped a structured, efficient, and practical approach to building software.
+
+## Skills & Interests
+- Fullstack web development (Next.js, Node.js)
+- REST API design and backend systems
+- Third-party integrations
+- Clean application architecture
+
+## How He Works
+Prefers simple, clear, and reliable solutions. Focused on building systems that are easy to understand and scalable.
+
+## Current
+- Working in warehouse operations
+- Building personal fullstack projects
+- Growing toward end-to-end system development
+
+## Links
+- Portfolio: https://febriardiansyah.my.id
+- GitHub: https://github.com/febriarr
+- Instagram: https://instagram.com/febriiar_
+- Tiktok: https://tiktok.com/@febriarrr
+- linkedIn: https://www.linkedin.com/in/febri-ardiansyah-a6ba1a305

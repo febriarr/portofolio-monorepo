@@ -18,14 +18,31 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  authors: [
-    {
-      name: "Febri Ardiansyah",
-      url: "https://github.com/febriarr",
-    },
-  ],
+  metadataBase: new URL("https://febriardiansyah.my.id"),
+  title: {
+    default: "Febri Ardiansyah - Fullstack Developer",
+    template: "%s | Febri Ardiansyah",
+  },
+  description: "Fullstack Developer specializing in Next.js and Node.js",
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    url: "https://febriardiansyah.my.id",
+    siteName: "Febri Ardiansyah Portfolio",
+  },
+
+  authors: [{ name: "Febri Ardiansyah", url: "https://github.com/febriarr" }],
   creator: "Febri Ardiansyah",
   keywords: ["Febri Ardiansyah", "Portfolio", "Fullstack Developer", "Next.js", "NestJS"],
+
+  manifest: "/site.webmanifest",
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 }
 
 export default function RootLayout({

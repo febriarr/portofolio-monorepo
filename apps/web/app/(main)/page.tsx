@@ -9,8 +9,21 @@ import { ProjectsSection } from "@/components/layouts/projects-section"
 import { ContactSection } from "@/components/layouts/contact-section"
 
 export const metadata: Metadata = {
-  title: "Home Page Portofolio Febri Ardiansyah",
-  description: "Welcome to my Personal Portofolio, Febri Ardiansyah",
+  title: "Home",
+  description: "Fullstack Developer specializing in Next.js, Node.js, and modern web technologies.",
+  openGraph: {
+    title: "Febri Ardiansyah - Fullstack Developer",
+    description: "Fullstack Developer specializing in Next.js, Node.js.",
+    url: "https://febriardiansyah.my.id",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Febri Ardiansyah Portfolio",
+      },
+    ],
+  },
 }
 
 export const dynamic = "force-dynamic"
