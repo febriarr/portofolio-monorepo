@@ -22,7 +22,7 @@ export default function PlanningAction() {
       </div>
       <div className="flex w-full flex-col space-y-2">
         <TypographyP>Ada Project Category Baru?</TypographyP>
-        <Link href="/dashboard/project-category">
+        <Link href="/dashboard/project-categories">
           <div className="w-full rounded-xs border p-6 hover:bg-primary hover:text-primary-foreground">
             <div className="space-y-2">
               <div className="flex items-center space-x-2">

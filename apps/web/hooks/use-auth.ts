@@ -23,8 +23,8 @@ export const useLogout = () => {
   return useMutation({
     mutationFn: authService.logout,
     onSuccess: () => {
-      router.push("/login")
       router.refresh()
+      router.push("/login")
     },
   })
 }
