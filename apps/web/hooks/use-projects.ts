@@ -1,3 +1,5 @@
+"use client"
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { ProjectsMeta, projectsService } from "@/services/projects-service"
 import { CreateProject, ProjectsFilter, UpdateProject } from "@workspace/validator"
@@ -48,9 +50,17 @@ export const useCreateProject = () => {
   const { alert, hide } = useAlert()
 
   return useMutation({
-    mutationFn: async ({ payload, images }: { payload: CreateProject; images?: File[] }) => {
-      if (images?.length) {
-        const res = await projectsService.createWithImages(payload, images)
+    mutationFn: async ({
+      payload,
+      images,
+      thumbnail,
+    }: {
+      payload: CreateProject
+      images?: File[]
+      thumbnail?: File
+    }) => {
+      if (images?.length || thumbnail) {
+        const res = await projectsService.createWithImages(payload, images ?? [], thumbnail)
         return res.data
       }
       const res = await projectsService.create(payload)
@@ -77,13 +87,15 @@ export const useUpdateProject = () => {
       id,
       payload,
       images,
+      thumbnail,
     }: {
       id: number
       payload: UpdateProject
       images?: File[]
+      thumbnail?: File
     }) => {
-      if (images?.length) {
-        const res = await projectsService.updateWithImages(id, payload, images)
+      if (images?.length || thumbnail) {
+        const res = await projectsService.updateWithImages(id, payload, images, thumbnail)
         return res.data
       }
       const res = await projectsService.update(id, payload)

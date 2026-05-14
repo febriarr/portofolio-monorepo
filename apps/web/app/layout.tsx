@@ -23,17 +23,36 @@ export const metadata: Metadata = {
     default: "Febri Ardiansyah - Fullstack Developer",
     template: "%s | Febri Ardiansyah",
   },
-  description: "Fullstack Developer specializing in Next.js and Node.js",
+  description:
+    "Personal portfolio of Febri Ardiansyah, a fullstack developer focused on building modern, scalable, and high-performance web applications.",
+  keywords: [
+    "Febri Ardiansyah",
+    "fullstack developer",
+    "web developer",
+    "backend developer",
+    "frontend developer",
+    "Next.js",
+    "React",
+    "Node.js",
+    "TypeScript",
+    "JavaScript",
+  ],
   openGraph: {
-    type: "website",
-    locale: "id_ID",
-    url: "https://www.febriardiansyah.my.id",
-    siteName: "Febri Ardiansyah Portfolio",
+    title: "Febri Ardiansyah - Fullstack Developer",
+    description: "Fullstack Developer specializing in Next.js, Node.js.",
+    url: "https://febriardiansyah.my.id",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Febri Ardiansyah Portfolio",
+      },
+    ],
   },
 
   authors: [{ name: "Febri Ardiansyah", url: "https://github.com/febriarr" }],
   creator: "Febri Ardiansyah",
-  keywords: ["Febri Ardiansyah", "Portfolio", "Fullstack Developer", "Next.js", "NestJS"],
 
   manifest: "/site.webmanifest",
   icons: {

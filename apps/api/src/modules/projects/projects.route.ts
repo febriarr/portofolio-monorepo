@@ -7,12 +7,16 @@ const projectsRouter: Router = Router()
 
 projectsRouter.get("/", projectsController.findAll)
 projectsRouter.get("/:id", projectsController.findById)
+projectsRouter.get("/slug/:slug", projectsController.findBySlug)
 
 projectsRouter.post("/", authenticate, projectsController.create)
 projectsRouter.post(
   "/with-images",
   authenticate,
-  upload.array("images"),
+  upload.fields([
+    { name: "thumbnail", maxCount: 1 },
+    { name: "images", maxCount: 10 },
+  ]),
   projectsController.createWithImages
 )
 
@@ -20,7 +24,10 @@ projectsRouter.patch("/:id", authenticate, projectsController.update)
 projectsRouter.patch(
   "/:id/with-images",
   authenticate,
-  upload.array("images"),
+  upload.fields([
+    { name: "thumbnail", maxCount: 1 },
+    { name: "images", maxCount: 10 },
+  ]),
   projectsController.updateWithImages
 )
 

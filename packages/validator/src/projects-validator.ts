@@ -21,8 +21,10 @@ export const createProjectSchema = z.object({
   liveUrl: z.string().nullish(),
   linkRepo: z.string().nullish(),
   categoryId: z.coerce.number().int().positive().nullish(),
+  thumbnailUrl: z.string().min(5).nullish(),
   images: z.array(createProjectImages).optional(),
   techStackIds: z.array(z.coerce.number().int().positive()).optional(),
+  slug: z.string().min(5).nullish().optional(),
 })
 
 export const updateProjectSchema = createProjectSchema.partial().extend({
@@ -36,6 +38,7 @@ export const updateProjectSchema = createProjectSchema.partial().extend({
         })
     )
     .optional(),
+  deletedThumbnailPath: z.string().optional(),
 })
 
 export const projectsFilterSchema = baseFilterSchema.extend({
@@ -43,6 +46,8 @@ export const projectsFilterSchema = baseFilterSchema.extend({
   categoryId: z.coerce.number().int().positive().optional(),
   techStackId: z.coerce.number().int().positive().optional(),
 })
+
+export const paramsSchema = z.string()
 
 // project Images
 export type CreateProjectImages = z.infer<typeof createProjectImages>
@@ -55,3 +60,5 @@ export type CreateProject = z.infer<typeof createProjectSchema>
 export type UpdateProject = z.infer<typeof updateProjectSchema>
 //filter
 export type ProjectsFilter = z.infer<typeof projectsFilterSchema>
+// params
+export type Params = z.infer<typeof paramsSchema>

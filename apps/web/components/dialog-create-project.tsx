@@ -32,6 +32,10 @@ export function DialogCreateProject({
   techStackOptions = [],
 }: DialogCreateProjectProps) {
   const [open, setOpen] = useState(false)
+
+  const [thumbnail, setThumbnail] = useState<{ file: File; url: string } | null>(null)
+  const thumbnailInputRef = useRef<HTMLInputElement>(null)
+
   const [previews, setPreviews] = useState<{ file: File; url: string }[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -59,10 +63,25 @@ export function DialogCreateProject({
   useEffect(() => {
     if (!open) {
       previews.forEach((p) => URL.revokeObjectURL(p.url))
+      if (thumbnail) URL.revokeObjectURL(thumbnail.url)
       setPreviews([])
+      setThumbnail(null)
       reset()
     }
   }, [open])
+
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (thumbnail) URL.revokeObjectURL(thumbnail.url)
+    setThumbnail({ file, url: URL.createObjectURL(file) })
+    if (thumbnailInputRef.current) thumbnailInputRef.current.value = ""
+  }
+
+  const removeThumbnail = () => {
+    if (thumbnail) URL.revokeObjectURL(thumbnail.url)
+    setThumbnail(null)
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? [])
@@ -85,7 +104,10 @@ export function DialogCreateProject({
 
   const onSubmit = (values: CreateProject) => {
     const images = previews.map((p) => p.file)
-    createProject({ payload: values, images }, { onSuccess: () => setOpen(false) })
+    createProject(
+      { payload: values, images, thumbnail: thumbnail?.file },
+      { onSuccess: () => setOpen(false) }
+    )
   }
 
   return (
@@ -216,6 +238,65 @@ export function DialogCreateProject({
                 )}
               />
               <FieldError errors={[errors.techStackIds]} />
+            </Field>
+
+            {/* Thumbnail */}
+            <Field>
+              <FieldLabel>
+                Thumbnail
+                <span className="ml-1 text-xs font-normal text-muted-foreground">
+                  (Cover utama project)
+                </span>
+              </FieldLabel>
+
+              {thumbnail ? (
+                <div className="relative aspect-video w-full overflow-hidden rounded-md border">
+                  <Image
+                    src={thumbnail.url}
+                    alt="Thumbnail preview"
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 flex items-start justify-end gap-2 p-2">
+                    {/* Ganti thumbnail */}
+                    <button
+                      type="button"
+                      onClick={() => thumbnailInputRef.current?.click()}
+                      className="rounded-full bg-black/60 px-2 py-1 text-xs text-white transition-colors hover:bg-black/80"
+                    >
+                      Change
+                    </button>
+                    {/* Hapus thumbnail */}
+                    <button
+                      type="button"
+                      onClick={removeThumbnail}
+                      className="rounded-full bg-black/60 p-1 text-white transition-colors hover:bg-destructive"
+                    >
+                      <XIcon className="size-3" />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => thumbnailInputRef.current?.click()}
+                  className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-input py-8 text-sm text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                >
+                  <ImageIcon className="size-4" />
+                  Click to upload thumbnail
+                </button>
+              )}
+
+              {/* Hidden input thumbnail */}
+              <input
+                ref={thumbnailInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleThumbnailChange}
+              />
+
+              <FieldError errors={[errors.thumbnailUrl]} />
             </Field>
 
             {/* Images */}

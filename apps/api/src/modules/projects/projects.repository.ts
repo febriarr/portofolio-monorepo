@@ -7,6 +7,7 @@ import { eq, ilike, inArray, SQL } from "drizzle-orm"
 import { QueryHelper } from "@/shared/helpers/query-helper"
 import { NotFoundError } from "@/shared/errors/custom-error"
 import { IProjectsRepository } from "@/modules/projects/projects.interface"
+import { id } from "zod/locales"
 
 export class ProjectsRepository
   extends BaseRepository<
@@ -158,5 +159,20 @@ export class ProjectsRepository
 
       return project
     })
+  }
+
+  async findBySlug(slug: string): Promise<ProjectWithMeta> {
+    const project = await this.database.query.projects.findFirst({
+      where: eq(projects.slug, slug),
+      with: {
+        images: true,
+        category: true,
+        techStacks: { with: { techStack: true } },
+      },
+    })
+
+    if (!project) throw new NotFoundError(`Project with id ${id} not found`)
+
+    return project
   }
 }

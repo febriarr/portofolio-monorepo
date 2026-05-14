@@ -4,9 +4,10 @@ import { asyncHandler } from "@/shared/helpers/async-handler"
 
 import { successResponse } from "@/shared/helpers/success-response"
 
-import { UploadedFile } from "@workspace/shared"
+import { ProjectUploadedFiles } from "@workspace/shared"
 import { ProjectsFilter } from "@workspace/validator"
 import { IProjectsService } from "@/modules/projects/projects.interface"
+import { NotFoundError } from "@/shared/errors/custom-error"
 
 export class ProjectsController {
   constructor(private readonly projectsService: IProjectsService) {}
@@ -35,6 +36,17 @@ export class ProjectsController {
       res,
       data: project,
       message: "Project fetched successfully",
+    })
+  })
+
+  findBySlug = asyncHandler(async (req: Request, res: Response) => {
+    const slug = req.params.slug as string
+
+    const project = await this.projectsService.findBySlug(slug)
+
+    return successResponse({
+      res,
+      data: project,
     })
   })
 
@@ -73,7 +85,7 @@ export class ProjectsController {
   })
 
   createWithImages = asyncHandler(async (req: Request, res: Response) => {
-    const files = req.files as UploadedFile[] | undefined
+    const files = req.files as ProjectUploadedFiles | undefined
 
     const project = await this.projectsService.createWithImages(req.body, files)
 
@@ -87,7 +99,7 @@ export class ProjectsController {
 
   updateWithImages = asyncHandler(async (req: Request, res: Response) => {
     const id = Number(req.params.id)
-    const files = req.files as UploadedFile[] | undefined
+    const files = req.files as ProjectUploadedFiles | undefined
 
     const project = await this.projectsService.updateWithImages(id, req.body, files)
 

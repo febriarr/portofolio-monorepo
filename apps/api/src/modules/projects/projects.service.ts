@@ -5,12 +5,13 @@ import { IProjectsService } from "@/modules/projects/projects.interface"
 import {
   CreateProject,
   createProjectSchema,
+  paramsSchema,
   ProjectsFilter,
   projectsFilterSchema,
   UpdateProject,
   updateProjectSchema,
 } from "@workspace/validator"
-import { Project, ProjectWithMeta, UploadedFile } from "@workspace/shared"
+import { Project, ProjectUploadedFiles, ProjectWithMeta, UploadedFile } from "@workspace/shared"
 import { PaginatedResult } from "@/types/paginated-result"
 import { projects } from "@/config/db/schema"
 
@@ -33,16 +34,32 @@ export class ProjectsService
     super(projectsRepository)
   }
 
+  private generateSlug(text: string): string {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "") // Remove special characters
+      .replace(/[\s_]+/g, "-") // Replace spaces and underscores with hyphens
+      .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
+      .replace(/^-+|-+$/g, "") // Remove leading/trailing hyphens
+  }
+
   // Override karena ada Zod parse
   override async create(payload: CreateProject): Promise<Project> {
     const data = createProjectSchema.parse(payload)
-    return this.repository.create(data)
+    return this.repository.create({
+      ...data,
+      slug: this.generateSlug(data.title),
+    })
   }
 
   // Override karena ada Zod parse
   override async update(id: number, payload: UpdateProject): Promise<Project> {
     const data = updateProjectSchema.parse(payload)
-    return this.repository.update(id, data)
+    return this.repository.update(id, {
+      ...data,
+      ...(data.title && { slug: this.generateSlug(data.title) }),
+    })
   }
 
   async findAll(filter?: ProjectsFilter): Promise<PaginatedResult<ProjectWithMeta>> {
@@ -56,29 +73,39 @@ export class ProjectsService
     return this.projectsRepository.findByIdWithDetail(id)
   }
 
-  async createWithImages(payload: CreateProject, images?: UploadedFile[]): Promise<Project> {
-    try {
-      const data = createProjectSchema.parse(payload)
+  async createWithImages(payload: CreateProject, files?: ProjectUploadedFiles): Promise<Project> {
+    const data = createProjectSchema.parse(payload)
 
-      if (images?.length) {
-        const uploaded = await this.imageService.createImages(images.map((file) => ({ file })))
-        data.images = uploaded.map((img) => ({ imageUrl: img.path }))
-      }
-
-      return this.repository.create(data)
-    } catch (error) {
-      throw error
+    // Upload thumbnail (single)
+    if (files?.thumbnail?.[0]) {
+      const [uploaded] = await this.imageService.createImages([{ file: files.thumbnail[0] }])
+      data.thumbnailUrl = uploaded?.path
     }
+
+    // Upload images (multiple)
+    if (files?.images?.length) {
+      const uploaded = await this.imageService.createImages(files.images.map((file) => ({ file })))
+      data.images = uploaded.map((img) => ({ imageUrl: img.path }))
+    }
+
+    return this.repository.create(data)
   }
 
   async updateWithImages(
     id: number,
     payload: UpdateProject,
-    images?: UploadedFile[]
+    files?: ProjectUploadedFiles
   ): Promise<Project> {
     const data = updateProjectSchema.parse(payload)
-    const { deletedImagePaths } = data
+    const { deletedImagePaths, deletedThumbnailPath } = data
 
+    // Hapus thumbnail lama jika ada
+    if (deletedThumbnailPath) {
+      await this.imageService.deleteImages([deletedThumbnailPath])
+      data.thumbnailUrl = null // atau undefined tergantung schema
+    }
+
+    // Hapus images lama jika ada
     if (deletedImagePaths?.length) {
       await Promise.all([
         this.imageService.deleteImages(deletedImagePaths),
@@ -86,11 +113,23 @@ export class ProjectsService
       ])
     }
 
-    if (images?.length) {
-      const uploaded = await this.imageService.createImages(images.map((file) => ({ file })))
+    // Upload thumbnail baru
+    if (files?.thumbnail?.[0]) {
+      const [uploaded] = await this.imageService.createImages([{ file: files.thumbnail[0] }])
+      data.thumbnailUrl = uploaded?.path
+    }
+
+    // Upload images baru
+    if (files?.images?.length) {
+      const uploaded = await this.imageService.createImages(files.images.map((file) => ({ file })))
       data.images = uploaded.map((img) => ({ imageUrl: img.path }))
     }
 
     return this.repository.update(id, data)
+  }
+
+  findBySlug(slug: string): Promise<ProjectWithMeta> {
+    const parsed = paramsSchema.parse(slug)
+    return this.projectsRepository.findBySlug(parsed)
   }
 }

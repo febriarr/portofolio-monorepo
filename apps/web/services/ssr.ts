@@ -36,3 +36,11 @@ export async function getProjectById(id: number) {
 
   return res.json() as Promise<ApiResponse<ProjectWithMeta>>
 }
+
+export async function getProjectBySlug(slug: string): Promise<ProjectWithMeta> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL!}/projects/slug/${slug}`)
+  const data = await res.json()
+  if (!res.ok) throw new Error("Failed to fetch project")
+
+  return data.data as ProjectWithMeta
+}

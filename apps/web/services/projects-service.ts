@@ -28,7 +28,11 @@ export const projectsService = {
     return apiClient.post<ApiResponse<Project>>("projects", payload)
   },
 
-  createWithImages: async (payload: CreateProject, images: File[]) => {
+  update: async (id: number, payload: UpdateProject) => {
+    return apiClient.patch<ApiResponse<Project>>(`projects/${id}`, payload)
+  },
+
+  createWithImages: async (payload: CreateProject, images: File[], thumbnail?: File) => {
     const formData = new FormData()
 
     Object.entries(payload).forEach(([key, value]) => {
@@ -39,6 +43,8 @@ export const projectsService = {
         formData.append(key, String(value))
       }
     })
+
+    if (thumbnail) formData.append("thumbnail", thumbnail)
 
     images.forEach((file) => formData.append("images", file))
 
@@ -47,11 +53,12 @@ export const projectsService = {
     })
   },
 
-  update: async (id: number, payload: UpdateProject) => {
-    return apiClient.patch<ApiResponse<Project>>(`projects/${id}`, payload)
-  },
-
-  updateWithImages: async (id: number, payload: UpdateProject, images?: File[]) => {
+  updateWithImages: async (
+    id: number,
+    payload: UpdateProject,
+    images?: File[],
+    thumbnail?: File
+  ) => {
     const formData = new FormData()
 
     Object.entries(payload).forEach(([key, value]) => {
@@ -63,6 +70,7 @@ export const projectsService = {
       }
     })
 
+    if (thumbnail) formData.append("thumbnail", thumbnail)
     images?.forEach((file) => formData.append("images", file))
 
     return apiClient.patch<ApiResponse<Project>>(`projects/${id}/with-images`, formData, {

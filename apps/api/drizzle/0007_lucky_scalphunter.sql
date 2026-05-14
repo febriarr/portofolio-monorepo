@@ -1,0 +1,1 @@
+CREATE INDEX "project_slug_idx" ON "projects" USING btree ("slug");

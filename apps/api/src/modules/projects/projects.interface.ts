@@ -3,8 +3,8 @@ import {
   IBaseRepository,
   IBaseService,
   Project,
+  ProjectUploadedFiles,
   ProjectWithMeta,
-  UploadedFile,
 } from "@workspace/shared"
 import { PaginatedResult } from "@/types/paginated-result"
 
@@ -18,6 +18,7 @@ export interface IProjectsRepository extends IBaseRepository<
   findAll(): Promise<{ data: ProjectWithMeta[]; total: number }>
   findByIdWithDetail(id: number): Promise<ProjectWithMeta>
   deleteImages(paths: string[]): Promise<void>
+  findBySlug(slug: string): Promise<ProjectWithMeta>
 }
 
 export interface IProjectsService extends IBaseService<
@@ -28,12 +29,13 @@ export interface IProjectsService extends IBaseService<
   ProjectsFilter
 > {
   findAll(filter?: ProjectsFilter): Promise<PaginatedResult<ProjectWithMeta>>
-  createWithImages(payload: CreateProject, images?: UploadedFile[]): Promise<Project>
+  createWithImages(payload: CreateProject, files?: ProjectUploadedFiles): Promise<Project>
   updateWithImages(
     id: number,
     payload: UpdateProject,
-    images?: UploadedFile[],
+    files?: ProjectUploadedFiles,
     deletedPaths?: string[]
   ): Promise<Project>
   findByIdWithDetail(id: number): Promise<ProjectWithMeta>
+  findBySlug(slug: string): Promise<ProjectWithMeta>
 }

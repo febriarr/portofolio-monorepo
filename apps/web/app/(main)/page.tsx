@@ -1,4 +1,3 @@
-import { Metadata } from "next"
 import { TypographyH1, TypographyP } from "@workspace/ui/components/typography"
 import CodeHero from "@/components/code-hero"
 import { Button } from "@workspace/ui/components/button"
@@ -8,31 +7,12 @@ import AboutSection from "@/components/layouts/about-section"
 import { ProjectsSection } from "@/components/layouts/projects-section"
 import { ContactSection } from "@/components/layouts/contact-section"
 
-export const metadata: Metadata = {
-  title: "Home",
-  description: "Fullstack Developer specializing in Next.js, Node.js, and modern web technologies.",
-  openGraph: {
-    title: "Febri Ardiansyah - Fullstack Developer",
-    description: "Fullstack Developer specializing in Next.js, Node.js.",
-    url: "https://febriardiansyah.my.id",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Febri Ardiansyah Portfolio",
-      },
-    ],
-  },
-}
-
-export const dynamic = "force-dynamic"
-
 export default async function Page() {
   const [techStacks, projects] = await Promise.all([
-    await getTechStacksSSR(),
-    await getProjects({ page: 1, limit: 6 }),
-  ])
+    getTechStacksSSR(),
+    getProjects({ page: 1, limit: 6 }),
+  ]).catch(() => [null, null])
+
   return (
     <main className="flex min-h-dvh w-full items-center justify-center py-16">
       {/* Container */}
@@ -45,7 +25,7 @@ export default async function Page() {
               Hi, I&apos;m <span className="text-primary">Febri Ardiansyah</span>
             </TypographyH1>
 
-            <TypographyP className="mt-4 text-muted-foreground">
+            <TypographyP className="mt-4">
               <span className="text-sm text-orange-foreground">
                 From Operations to Fullstack Developer
               </span>
@@ -69,11 +49,11 @@ export default async function Page() {
         </section>
 
         {/*  about */}
-        <AboutSection techStacks={techStacks} />
+        <AboutSection techStacks={techStacks ?? []} />
 
         {/*  Projects Section*/}
 
-        <ProjectsSection initialData={projects} />
+        <ProjectsSection initialData={projects ?? undefined} />
 
         {/*  Contact Section */}
         <ContactSection />

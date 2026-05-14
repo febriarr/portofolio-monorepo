@@ -37,6 +37,10 @@ export function SheetEditProject({
   categoryOptions = [],
   techStackOptions = [],
 }: SheetEditProjectProps) {
+  const [newThumbnail, setNewThumbnail] = useState<{ file: File; url: string } | null>(null)
+  const [deletedThumbnailPath, setDeletedThumbnailPath] = useState<string | null>(null)
+  const thumbnailInputRef = useRef<HTMLInputElement>(null)
+
   const [newPreviews, setNewPreviews] = useState<{ file: File; url: string }[]>([])
   const [deletedImagePaths, setDeletedImagePaths] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -65,24 +69,52 @@ export function SheetEditProject({
       categoryId: project.categoryId ?? undefined,
       techStackIds: project.techStacks?.map((ts) => ts.techStack.id) ?? [],
       deletedImagePaths: [],
+      deletedThumbnailPath: undefined,
     })
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setNewPreviews([])
     setDeletedImagePaths([])
-  }, [project])
+    setNewThumbnail(null)
+    setDeletedThumbnailPath(null)
+  }, [project, reset])
 
   useEffect(() => {
     if (!open) {
       newPreviews.forEach((p) => URL.revokeObjectURL(p.url))
+      if (newThumbnail) URL.revokeObjectURL(newThumbnail.url)
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setNewPreviews([])
       setDeletedImagePaths([])
+      setNewThumbnail(null)
+      setDeletedThumbnailPath(null)
     }
-  }, [open])
+  }, [newPreviews, newThumbnail, open])
+
+  const currentThumbnailPath = deletedThumbnailPath ? null : (project?.thumbnailUrl ?? null)
 
   const existingImages =
     project?.images?.filter((img) => img.imageUrl && !deletedImagePaths.includes(img.imageUrl)) ??
     []
 
   const totalImages = existingImages.length + newPreviews.length
+
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    // Revoke blob URL lama jika ada
+    if (newThumbnail) URL.revokeObjectURL(newThumbnail.url)
+    setNewThumbnail({ file, url: URL.createObjectURL(file) })
+    if (thumbnailInputRef.current) thumbnailInputRef.current.value = ""
+  }
+
+  const removeExistingThumbnail = () => {
+    if (project?.thumbnailUrl) setDeletedThumbnailPath(project.thumbnailUrl)
+  }
+
+  const removeNewThumbnail = () => {
+    if (newThumbnail) URL.revokeObjectURL(newThumbnail.url)
+    setNewThumbnail(null)
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? [])
@@ -109,12 +141,19 @@ export function SheetEditProject({
 
   const onSubmit = (values: UpdateProject) => {
     if (!project) return
+
     const payload: UpdateProject = {
       ...values,
       deletedImagePaths: deletedImagePaths.length ? deletedImagePaths : undefined,
+      deletedThumbnailPath: deletedThumbnailPath ?? undefined,
     }
+
     const images = newPreviews.map((p) => p.file)
-    updateProject({ id: project.id, payload, images }, { onSuccess: () => onOpenChange(false) })
+
+    updateProject(
+      { id: project.id, payload, images, thumbnail: newThumbnail?.file },
+      { onSuccess: () => onOpenChange(false) }
+    )
   }
 
   return (
@@ -223,6 +262,92 @@ export function SheetEditProject({
                 )}
               />
               <FieldError errors={[errors.techStackIds]} />
+            </Field>
+
+            {/* Thumbnail */}
+            <Field>
+              <FieldLabel>
+                Thumbnail
+                <span className="ml-1 text-xs font-normal text-muted-foreground">
+                  (Cover utama project)
+                </span>
+              </FieldLabel>
+
+              {/* Hidden input — selalu ada di DOM */}
+              <input
+                ref={thumbnailInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleThumbnailChange}
+              />
+
+              {/* Priority tampil: newThumbnail > existing dari DB > upload zone */}
+              {newThumbnail ? (
+                // Preview thumbnail baru (belum disimpan)
+                <div className="relative aspect-video w-full overflow-hidden rounded-md border border-dashed border-primary">
+                  <Image
+                    src={newThumbnail.url}
+                    alt="New thumbnail preview"
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 flex items-start justify-end gap-2 p-2">
+                    <button
+                      type="button"
+                      onClick={() => thumbnailInputRef.current?.click()}
+                      className="rounded-full bg-black/60 px-2 py-1 text-xs text-white transition-colors hover:bg-black/80"
+                    >
+                      Change
+                    </button>
+                    <button
+                      type="button"
+                      onClick={removeNewThumbnail}
+                      className="rounded-full bg-black/60 p-1 text-white transition-colors hover:bg-destructive"
+                    >
+                      <XIcon className="size-3" />
+                    </button>
+                  </div>
+                </div>
+              ) : currentThumbnailPath ? (
+                // Thumbnail existing dari DB
+                <div className="relative aspect-video w-full overflow-hidden rounded-md border">
+                  <Image
+                    src={`${process.env.NEXT_PUBLIC_LINK_R2}/${currentThumbnailPath}`}
+                    alt="Current thumbnail"
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 flex items-start justify-end gap-2 p-2">
+                    <button
+                      type="button"
+                      onClick={() => thumbnailInputRef.current?.click()}
+                      className="rounded-full bg-black/60 px-2 py-1 text-xs text-white transition-colors hover:bg-black/80"
+                    >
+                      Change
+                    </button>
+                    <button
+                      type="button"
+                      onClick={removeExistingThumbnail}
+                      className="rounded-full bg-black/60 p-1 text-white transition-colors hover:bg-destructive"
+                    >
+                      <XIcon className="size-3" />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                // Tidak ada thumbnail — tampilkan upload zone
+                <button
+                  type="button"
+                  onClick={() => thumbnailInputRef.current?.click()}
+                  className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-input py-8 text-sm text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                >
+                  <ImageIcon className="size-4" />
+                  Upload thumbnail
+                </button>
+              )}
+
+              <FieldError errors={[errors.thumbnailUrl]} />
             </Field>
 
             {/* Images */}

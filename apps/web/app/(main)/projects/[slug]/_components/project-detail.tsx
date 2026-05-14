@@ -11,7 +11,7 @@ import {
 } from "@phosphor-icons/react/dist/ssr"
 import { ProjectWithMeta } from "@workspace/shared"
 import { formatDate } from "@/lib/utils"
-import { ProjectImageGallery } from "@/app/(main)/projects/[title]/_components/project-image-gallery"
+import { ProjectImageGallery } from "@/app/(main)/projects/[slug]/_components/project-image-gallery"
 
 export function ProjectDetail({ project }: { project: ProjectWithMeta }) {
   const hasImages = (project.images?.length ?? 0) > 0

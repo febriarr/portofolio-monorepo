@@ -9,6 +9,8 @@ export interface Project extends TimestampType {
   liveUrl: string | null
   linkRepo: string | null
   categoryId: number | null
+  thumbnailUrl: string | null
+  slug: string | null
 }
 
 export interface ProjectImages extends TimestampType {

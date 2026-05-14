@@ -6,3 +6,8 @@ export interface UploadedFile {
   size: number
   buffer: Buffer
 }
+
+export type ProjectUploadedFiles = {
+  thumbnail?: UploadedFile[]
+  images?: UploadedFile[]
+}

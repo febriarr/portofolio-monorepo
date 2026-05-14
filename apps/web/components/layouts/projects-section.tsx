@@ -16,13 +16,13 @@ import {
 } from "@workspace/ui/components/pagination"
 import { ArrowSquareInIcon, ImageIcon } from "@phosphor-icons/react"
 import { ProjectsMeta } from "@/services/projects-service"
-import { TypographyH2, TypographyLead } from "@workspace/ui/components/typography"
+import { TypographyH2, TypographyP } from "@workspace/ui/components/typography"
 import Link from "next/link"
 import { formatDate, truncate } from "@/lib/utils"
 
 type InitialData = ApiResponse<ProjectWithMeta[]> & { meta: ProjectsMeta }
 
-export function ProjectsSection({ initialData }: { initialData: InitialData }) {
+export function ProjectsSection({ initialData }: { initialData?: InitialData }) {
   const [page, setPage] = useState(1)
 
   const { data, isLoading } = useProjects(
@@ -38,9 +38,7 @@ export function ProjectsSection({ initialData }: { initialData: InitialData }) {
     <section className="w-full space-y-8 py-16 md:space-y-12 lg:space-y-16" id="projects">
       <div className="space-y-2">
         <TypographyH2>Projects</TypographyH2>
-        <TypographyLead>
-          Things I've built while learning and growing as a developer.
-        </TypographyLead>
+        <TypographyP>Things I've built while learning and growing as a developer.</TypographyP>
       </div>
 
       {isLoading ? (
@@ -62,16 +60,17 @@ export function ProjectsSection({ initialData }: { initialData: InitialData }) {
 
 function ProjectCard({ project }: { project: ProjectWithMeta }) {
   return (
-    <Link href={`/projects/${encodeURIComponent(project.title)}?id=${project.id}`}>
-      <div className="group relative flex h-full flex-col overflow-hidden rounded-xs border bg-card transition-shadow hover:shadow-md">
+    <Link href={`/projects/${project.slug}`}>
+      <div className="group relative flex h-full flex-col overflow-hidden rounded-xs border bg-background transition-shadow hover:shadow-md">
         {/* Cover Image */}
         <div className="relative aspect-video w-full bg-muted">
           <div className="absolute z-50 flex h-full w-full items-center justify-center gap-1 bg-black/20 text-sm text-orange-foreground opacity-0 transition-opacity group-hover:opacity-100">
             <ArrowSquareInIcon className="size-4" /> Lihat Project
           </div>
-          {project.images[0]?.imageUrl ? (
+
+          {project.thumbnailUrl ? (
             <Image
-              src={`${process.env.NEXT_PUBLIC_LINK_R2}/${project.images[0].imageUrl}`}
+              src={`${process.env.NEXT_PUBLIC_LINK_R2}/${project.thumbnailUrl}`}
               alt={project.title}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
@@ -79,13 +78,6 @@ function ProjectCard({ project }: { project: ProjectWithMeta }) {
           ) : (
             <div className="flex size-full flex-col items-center justify-center gap-2 text-muted-foreground/40">
               <ImageIcon className="size-8" />
-              <span className="text-xs">No image</span>
-            </div>
-          )}
-
-          {project.images.length > 1 && (
-            <div className="absolute right-2 bottom-2 rounded-md bg-black/60 px-2 py-0.5 text-xs text-white backdrop-blur-sm">
-              +{project.images.length - 1} more
             </div>
           )}
         </div>
@@ -95,7 +87,7 @@ function ProjectCard({ project }: { project: ProjectWithMeta }) {
           <p className="truncate leading-tight font-medium">{project.title}</p>
           <div className="h-8">
             {project.shortDescription && (
-              <p className="line-clamp-2 text-xs"> {truncate(project.shortDescription, 50)}</p>
+              <p className="line-clamp-2 text-xs">{truncate(project.shortDescription, 50)}</p>
             )}
           </div>
 
@@ -121,7 +113,7 @@ function ProjectCard({ project }: { project: ProjectWithMeta }) {
 
           <div className="flex w-full items-center justify-between">
             <p className="text-xs text-muted-foreground">{formatDate(project.createdAt)}</p>
-            <ArrowSquareInIcon className="size-4" />
+            <ArrowSquareInIcon className="size-4 text-blue-700" />
           </div>
         </div>
       </div>

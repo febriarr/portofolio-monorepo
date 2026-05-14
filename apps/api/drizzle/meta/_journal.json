@@ -36,6 +36,34 @@
       "when": 1778186922365,
       "tag": "0004_dear_rocket_raccoon",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1778793381993,
+      "tag": "0005_keen_sister_grimm",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1778798032892,
+      "tag": "0006_stale_brood",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1778799180666,
+      "tag": "0007_lucky_scalphunter",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1778799467783,
+      "tag": "0008_whole_korath",
+      "breakpoints": true
     }
   ]
 }
