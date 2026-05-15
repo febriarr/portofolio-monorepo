@@ -9,5 +9,18 @@ export const Users: CollectionConfig = {
   fields: [
     // Email added by default
     // Add more fields as needed
+    {
+      name: 'name',
+      type: 'text',
+    },
+    {
+      name: 'bio',
+      type: 'textarea',
+    },
+    {
+      name: 'avatar',
+      type: 'upload',
+      relationTo: 'media',
+    },
   ],
 }

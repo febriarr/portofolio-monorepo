@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
-    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
+    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev -p 3001",
     "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev -p 3001",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
@@ -18,7 +18,9 @@
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1047.0",
     "@payloadcms/next": "3.84.1",
+    "@payloadcms/storage-s3": "^3.84.1",
     "@payloadcms/richtext-lexical": "3.84.1",
     "@payloadcms/ui": "3.84.1",
     "cross-env": "^7.0.3",
@@ -38,6 +40,7 @@
   "devDependencies": {
     "@playwright/test": "1.58.2",
     "@testing-library/react": "16.3.0",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/node": "22.19.9",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
@@ -48,6 +51,7 @@
     "prettier": "^3.4.2",
     "tsx": "4.21.0",
     "typescript": "5.7.3",
+    "tailwindcss": "^4.1.18",
     "vite-tsconfig-paths": "6.0.5",
     "vitest": "4.0.18",
     "@tailwindcss/postcss": "^4.1.18"
