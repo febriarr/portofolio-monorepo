@@ -74,6 +74,34 @@ export const Posts: CollectionConfig = {
       required: true,
     },
     {
+      name: 'isHighlighted',
+      label: 'Highlight Post',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+      },
+      hooks: {
+        beforeChange: [
+          async ({ data, req }) => {
+            if (data?.isHighlighted) {
+              await req.payload.update({
+                collection: 'posts',
+                where: {
+                  isHighlighted: {
+                    equals: true,
+                  },
+                },
+                data: {
+                  isHighlighted: false,
+                },
+              })
+            }
+          },
+        ],
+      },
+    },
+    {
       name: 'author',
       type: 'relationship',
       relationTo: 'users',
@@ -94,8 +122,9 @@ export const Posts: CollectionConfig = {
             {
               name: 'title',
               type: 'text',
-              minLength: 10,
-              maxLength: 60,
+              admin: {
+                description: 'Optional, Jika kosong akan menggunakan title post.',
+              },
             },
             {
               name: 'description',

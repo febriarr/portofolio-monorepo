@@ -22,6 +22,12 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      graphics: {
+        Logo: './components/custom-logo',
+        Icon: './components/custom-logo',
+      },
+    },
   },
   collections: [Users, Media, Posts, Categories, Tags],
   editor: lexicalEditor({

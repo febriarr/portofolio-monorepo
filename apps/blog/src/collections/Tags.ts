@@ -31,6 +31,10 @@ export const Tags: CollectionConfig = {
       type: 'text',
       unique: true,
       required: true,
+      admin: {
+        position: 'sidebar',
+        description: 'Auto generated Slug',
+      },
     },
   ],
 }

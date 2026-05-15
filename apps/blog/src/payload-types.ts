@@ -198,8 +198,12 @@ export interface Post {
     };
     [k: string]: unknown;
   };
+  isHighlighted?: boolean | null;
   author: number | User;
   meta?: {
+    /**
+     * Optional, Jika kosong akan menggunakan title post.
+     */
     title?: string | null;
     description?: string | null;
     image?: (number | null) | Media;
@@ -216,6 +220,9 @@ export interface Post {
 export interface Category {
   id: number;
   name: string;
+  /**
+   * Auto generated Slug
+   */
   slug: string;
   description?: string | null;
   updatedAt: string;
@@ -228,6 +235,9 @@ export interface Category {
 export interface Tag {
   id: number;
   name: string;
+  /**
+   * Auto generated Slug
+   */
   slug: string;
   updatedAt: string;
   createdAt: string;
@@ -374,6 +384,7 @@ export interface PostsSelect<T extends boolean = true> {
   tags?: T;
   heroImage?: T;
   content?: T;
+  isHighlighted?: T;
   author?: T;
   meta?:
     | T

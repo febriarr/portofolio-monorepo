@@ -8,7 +8,7 @@ const dirname = path.dirname(__filename)
 const monorepoRoot = path.resolve(dirname, '../..')
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['@workspace/ui'],
+  transpilePackages: ['@workspace/ui', '@workspace/validator'],
   images: {
     localPatterns: [
       {

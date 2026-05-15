@@ -31,6 +31,10 @@ export const Categories: CollectionConfig = {
       type: 'text',
       unique: true,
       required: true,
+      admin: {
+        position: 'sidebar',
+        description: 'Auto generated Slug',
+      },
     },
     {
       name: 'description',

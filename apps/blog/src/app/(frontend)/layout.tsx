@@ -1,5 +1,6 @@
 import React from 'react'
 import '@workspace/ui/globals.css'
+import Provider from '@/components/provider'
 
 export const metadata = {
   description: 'A blank template using Payload in a Next.js app.',
@@ -11,8 +12,8 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
 
   return (
     <html lang="en">
-      <body>
-        <main>{children}</main>
+      <body suppressHydrationWarning>
+        <Provider>{children}</Provider>
       </body>
     </html>
   )
