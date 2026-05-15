@@ -1,6 +1,52 @@
+import {
+  EnvelopeIcon,
+  GithubLogoIcon,
+  InstagramLogoIcon,
+  LinkedinLogoIcon,
+  TiktokLogoIcon,
+  WhatsappLogoIcon,
+} from "@phosphor-icons/react/ssr"
 import Link from "next/link"
-import { CONTACTS } from "@/components/layouts/contact-section"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { ThemeToggle } from "@workspace/ui/components/theme-toggle"
+
+export const CONTACTS = [
+  {
+    label: "GitHub",
+    href: "https://github.com/febriarr",
+    icon: GithubLogoIcon,
+    value: "@febriarr",
+  },
+  {
+    label: "Email",
+    href: "mailto:hello.febriar@gmail.com",
+    icon: EnvelopeIcon,
+    value: "hello.febriarr@gmail.com",
+  },
+  {
+    label: "WhatsApp",
+    href: "https://wa.me/6285857912408",
+    icon: WhatsappLogoIcon,
+    value: "+62 8585 7912 408",
+  },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/febri-ardiansyah-a6ba1a305",
+    icon: LinkedinLogoIcon,
+    value: "Febri Ardiansyah",
+  },
+  {
+    label: "Instagram",
+    href: "https://instagram.com/febriiar_",
+    icon: InstagramLogoIcon,
+    value: "@febriiar_",
+  },
+  {
+    label: "TikTok",
+    href: "https://tiktok.com/@febriarrr",
+    icon: TiktokLogoIcon,
+    value: "@febriarrr",
+  },
+]
 
 const NAV_LINKS = [
   { href: "#about", label: "About" },
