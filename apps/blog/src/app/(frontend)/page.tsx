@@ -3,6 +3,8 @@ import { getCategories, getPublishedPosts } from '@/queries'
 import BlogTabs from '@/components/blog-tabs'
 import { Metadata } from 'next'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Blog',
   description: 'Read our latest articles and insights on various topics.',
