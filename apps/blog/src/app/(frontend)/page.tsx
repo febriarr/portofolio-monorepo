@@ -14,6 +14,10 @@ export default async function HomePage() {
     getPublishedPosts({ limit: 10 }),
   ])
 
+  if (!categoriesResult || !postsResult) {
+    return <div className={'text-center'}>No Content found.</div>
+  }
+
   const highlightedPost = postsResult.docs.find((p) => p.isHighlighted) ?? null
 
   return (
