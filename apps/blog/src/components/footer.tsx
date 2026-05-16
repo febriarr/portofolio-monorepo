@@ -1,4 +1,3 @@
-'use client'
 import {
   EnvelopeIcon,
   GithubLogoIcon,

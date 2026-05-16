@@ -5,6 +5,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs'
 import { Input } from '@workspace/ui/components/input'
+import { Button } from '@workspace/ui/components/button'
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
 import { searchSchema } from '@workspace/validator'
 import type { Category, Media, Post } from '@/payload-types'
@@ -14,10 +15,10 @@ import Image from 'next/image'
 type BlogTabsProps = {
   categories: Category[]
   initialPosts: Post[]
+  initialHasNextPage: boolean
   highlightedPost: Post | null
 }
 
-// Helpers
 function getCategoryName(category: Post['category']): string {
   if (typeof category === 'object' && category !== null) return category.name
   return ''
@@ -61,7 +62,6 @@ function PostCard({ post, highlighted = false }: { post: Post; highlighted?: boo
         <div className={`flex flex-col ${highlighted ? 'flex-1 p-8 border-l' : 'h-full'}`}>
           <div className="mb-4 flex items-center justify-between gap-4">
             <p className="text-sm font-medium text-primary">{getCategoryName(post.category)}</p>
-
             <p className="shrink-0 text-sm font-medium text-muted-foreground">
               {post.publishedAt
                 ? new Date(post.publishedAt).toLocaleDateString('en-US', {
@@ -128,13 +128,16 @@ function BlogGrid({
   )
 }
 
-// Main
-export default function BlogTabs({ categories, initialPosts, highlightedPost }: BlogTabsProps) {
+export default function BlogTabs({
+  categories,
+  initialPosts,
+  initialHasNextPage,
+  highlightedPost,
+}: BlogTabsProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  // STABLE STRING
   const searchParamsString = useMemo(() => searchParams.toString(), [searchParams])
 
   const currentCategory = searchParams.get('category') ?? 'all'
@@ -142,7 +145,10 @@ export default function BlogTabs({ categories, initialPosts, highlightedPost }: 
 
   const [searchValue, setSearchValue] = useState(currentSearch)
   const [posts, setPosts] = useState<Post[]>(initialPosts)
+  const [hasNextPage, setHasNextPage] = useState(initialHasNextPage)
+  const [nextPage, setNextPage] = useState<number | null>(initialHasNextPage ? 2 : null)
   const [loading, setLoading] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
 
   const updateParams = useCallback(
     (params: { category?: string; search?: string }) => {
@@ -159,27 +165,20 @@ export default function BlogTabs({ categories, initialPosts, highlightedPost }: 
       }
 
       const nextQuery = next.toString()
-      const currentQuery = searchParamsString
-
       const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname
+      const currentUrl = searchParamsString ? `${pathname}?${searchParamsString}` : pathname
 
-      const currentUrl = currentQuery ? `${pathname}?${currentQuery}` : pathname
-
-      // IMPORTANT: prevent unnecessary navigation
-      if (nextUrl === currentUrl) {
-        return
-      }
+      if (nextUrl === currentUrl) return
 
       router.replace(nextUrl, { scroll: false })
     },
     [pathname, router, searchParamsString],
   )
 
-  // Debounce search update URL
+  // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
       const parsed = searchSchema.safeParse(searchValue)
-
       if (parsed.success) {
         updateParams({ search: parsed.data })
       }
@@ -188,7 +187,7 @@ export default function BlogTabs({ categories, initialPosts, highlightedPost }: 
     return () => clearTimeout(timer)
   }, [searchValue, updateParams])
 
-  // Fetch when params change
+  // Fetch fresh when filters change — reset pagination
   useEffect(() => {
     let cancelled = false
 
@@ -197,17 +196,18 @@ export default function BlogTabs({ categories, initialPosts, highlightedPost }: 
     fetchPostsAction({
       categorySlug: currentCategory !== 'all' ? currentCategory : undefined,
       search: currentSearch || undefined,
+      page: 1,
     })
-      .then((data) => {
+      .then(({ posts: data, hasNextPage: hnp, nextPage: np }) => {
         if (!cancelled) {
           setPosts(data)
+          setHasNextPage(hnp)
+          setNextPage(np)
         }
       })
       .catch(console.error)
       .finally(() => {
-        if (!cancelled) {
-          setLoading(false)
-        }
+        if (!cancelled) setLoading(false)
       })
 
     return () => {
@@ -215,12 +215,37 @@ export default function BlogTabs({ categories, initialPosts, highlightedPost }: 
     }
   }, [currentCategory, currentSearch])
 
+  const handleLoadMore = useCallback(async () => {
+    if (!nextPage || loadingMore) return
+
+    setLoadingMore(true)
+
+    try {
+      const {
+        posts: morePosts,
+        hasNextPage: hnp,
+        nextPage: np,
+      } = await fetchPostsAction({
+        categorySlug: currentCategory !== 'all' ? currentCategory : undefined,
+        search: currentSearch || undefined,
+        page: nextPage,
+      })
+
+      setPosts((prev) => [...prev, ...morePosts])
+      setHasNextPage(hnp)
+      setNextPage(np)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoadingMore(false)
+    }
+  }, [nextPage, loadingMore, currentCategory, currentSearch])
+
   return (
     <Tabs value={currentCategory} onValueChange={(value) => updateParams({ category: value })}>
       <div className="w-full flex flex-col md:flex-row gap-4">
         <div className="relative max-w-sm h-fit">
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-
           <Input
             className="pl-9"
             placeholder="Search articles..."
@@ -232,7 +257,6 @@ export default function BlogTabs({ categories, initialPosts, highlightedPost }: 
 
         <TabsList className="mb-6 h-auto flex-wrap gap-1" variant="line">
           <TabsTrigger value="all">All</TabsTrigger>
-
           {categories.map((cat) => (
             <TabsTrigger key={cat.id} value={cat.slug}>
               {cat.name}
@@ -250,6 +274,19 @@ export default function BlogTabs({ categories, initialPosts, highlightedPost }: 
           highlightedPost={highlightedPost}
           showHighlighted={currentCategory === 'all' && !currentSearch}
         />
+
+        {hasNextPage && (
+          <div className="mt-8 flex justify-center">
+            <Button
+              variant="outline"
+              onClick={handleLoadMore}
+              disabled={loadingMore}
+              className="min-w-32"
+            >
+              {loadingMore ? 'Loading...' : 'Load More'}
+            </Button>
+          </div>
+        )}
       </TabsContent>
     </Tabs>
   )

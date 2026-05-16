@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Febri Ardiansyah - Fullstack Developer',
-    description: 'Fullstack Developer specializing in Next.js, Node.js.',
+    description: 'Read my latest articles and insights on various topics.',
     url: 'https://febriardiansyah.my.id',
     images: [
       {

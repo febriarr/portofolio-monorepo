@@ -2,8 +2,7 @@ import React, { Suspense } from 'react'
 import { getCategories, getPublishedPosts } from '@/queries'
 import BlogTabs from '@/components/blog-tabs'
 import { Metadata } from 'next'
-
-export const dynamic = 'force-dynamic'
+import { cacheTag } from 'next/cache'
 
 export const metadata: Metadata = {
   title: 'Blog',
@@ -11,6 +10,8 @@ export const metadata: Metadata = {
 }
 
 export default async function HomePage() {
+  'use cache'
+  cacheTag('posts', 'categories')
   const [categoriesResult, postsResult] = await Promise.all([
     getCategories(),
     getPublishedPosts({ limit: 10 }),
@@ -28,6 +29,7 @@ export default async function HomePage() {
         <BlogTabs
           categories={categoriesResult.docs}
           initialPosts={postsResult.docs}
+          initialHasNextPage={postsResult.hasNextPage}
           highlightedPost={highlightedPost}
         />
       </Suspense>

@@ -1,5 +1,6 @@
 import { formatSlug } from '@/utils/format-slug'
 import { CollectionConfig } from 'payload'
+import { revalidateTag } from 'next/cache'
 
 export const Categories: CollectionConfig = {
   slug: 'categories',
@@ -13,6 +14,12 @@ export const Categories: CollectionConfig = {
     delete: ({ req }) => !!req.user,
   },
   hooks: {
+    afterChange: [
+      ({ doc }) => {
+        revalidateTag('categories', 'max')
+        return doc
+      },
+    ],
     beforeValidate: [
       ({ data }) => {
         if (data?.name && !data?.slug) {

@@ -1,6 +1,7 @@
 import { formatSlug } from '@/utils/format-slug'
 import { CollectionConfig } from 'payload'
 import { handleIsHighlighted } from '@/hooks/isHighlight'
+import { revalidateTag } from 'next/cache'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -17,6 +18,13 @@ export const Posts: CollectionConfig = {
     drafts: true,
   },
   hooks: {
+    afterChange: [
+      ({ doc }) => {
+        revalidateTag('posts', 'max')
+        revalidateTag(`post-${doc.slug}`, 'max')
+        return doc
+      },
+    ],
     beforeValidate: [
       ({ data, req }) => {
         // Skip kalau ini update dari hook isHighlight
