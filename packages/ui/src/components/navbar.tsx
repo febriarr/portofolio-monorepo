@@ -35,7 +35,7 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-[9999] w-full border-b bg-background">
-        <div className="container mx-auto flex items-center justify-between px-4 py-2">
+        <div className="container mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <BrainIcon weight="thin" size={30} />
             <p className="text-lg font-medium">Febri</p>

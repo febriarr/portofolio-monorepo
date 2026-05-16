@@ -1,5 +1,6 @@
 import { formatSlug } from '@/utils/format-slug'
 import { CollectionConfig } from 'payload'
+import { handleIsHighlighted } from '@/hooks/isHighlight'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -15,14 +16,15 @@ export const Posts: CollectionConfig = {
   hooks: {
     beforeValidate: [
       ({ data, req }) => {
+        // Skip kalau ini update dari hook isHighlight
+        if (req.context?.isHighlightUpdate) return data
+
         if (data?.title && !data?.slug) {
           data.slug = formatSlug(data.title)
         }
-
         if (req.user && !data?.author) {
           data!.author = req.user.id
         }
-
         if (data?._status === 'published' && !data?.publishedAt) {
           data.publishedAt = new Date().toISOString()
         }
@@ -82,23 +84,7 @@ export const Posts: CollectionConfig = {
         position: 'sidebar',
       },
       hooks: {
-        beforeChange: [
-          async ({ data, req }) => {
-            if (data?.isHighlighted) {
-              await req.payload.update({
-                collection: 'posts',
-                where: {
-                  isHighlighted: {
-                    equals: true,
-                  },
-                },
-                data: {
-                  isHighlighted: false,
-                },
-              })
-            }
-          },
-        ],
+        beforeChange: [handleIsHighlighted],
       },
     },
     {

@@ -75,4 +75,6 @@ export default buildConfig({
       },
     }),
   ],
+  cors: ['https://febriardiansyah.my.id'],
+  csrf: ['https://febriardiansyah.my.id'],
 })

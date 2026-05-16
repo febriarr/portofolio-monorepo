@@ -2,13 +2,14 @@
 
 import Link from 'next/link'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs'
 import { Input } from '@workspace/ui/components/input'
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
 import { searchSchema } from '@workspace/validator'
-import type { Category, Post } from '@/payload-types'
-import { fetchPostsAction } from '@/app/(frontend)/blog/_components/actions'
+import type { Category, Media, Post } from '@/payload-types'
+import { fetchPostsAction } from '@/queries/actions'
+import Image from 'next/image'
 
 type BlogTabsProps = {
   categories: Category[]
@@ -27,55 +28,72 @@ function getAuthorName(author: Post['author']): string {
   return ''
 }
 
-//  Post Card
 function PostCard({ post, highlighted = false }: { post: Post; highlighted?: boolean }) {
+  const heroImage = highlighted
+    ? ((post.heroImage as Media | null) ?? (post.meta?.image as Media | null))
+    : null
+
+  const imageUrl = typeof heroImage === 'object' && heroImage?.url ? heroImage.url : null
+
   return (
     <Link
-      href={`/blog/${post.slug}`}
-      className={highlighted ? 'col-span-1 block md:col-span-3' : 'block'}
+      href={`/${post.slug}`}
+      className={highlighted ? 'col-span-1 block md:col-span-2 lg:col-span-3' : 'block'}
     >
       <article
-        className={`flex h-full flex-col p-6 text-card-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground ${
-          highlighted ? 'md:min-h-[420px]' : ''
+        className={`flex h-full text-card-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground group ${
+          highlighted ? 'flex-col md:flex-row md:min-h-105' : 'flex-col p-6'
         }`}
       >
-        {/* Top */}
-        <div className="mb-4 flex items-center justify-between gap-4">
-          <p className="text-sm font-medium text-primary">{getCategoryName(post.category)}</p>
-
-          <p className="shrink-0 text-sm font-medium text-muted-foreground">
-            {post.publishedAt
-              ? new Date(post.publishedAt).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })
-              : ''}
-          </p>
-        </div>
-
-        {/* Highlight */}
-        {highlighted && (
-          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">
-            ★ Highlight
-          </p>
+        {highlighted && imageUrl && (
+          <div className="relative w-full shrink-0 overflow-hidden aspect-video md:aspect-auto md:w-1/2 md:self-stretch">
+            <Image
+              src={imageUrl}
+              alt={heroImage?.alt ?? post.title}
+              fill
+              className="object-cover object-bottom absolute w-full h-full inset-0"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              priority
+            />
+          </div>
         )}
 
-        {/* Title */}
-        <h2
-          className={`mb-4 font-semibold leading-tight tracking-normal ${
-            highlighted ? 'line-clamp-3 text-3xl md:text-4xl' : 'line-clamp-2 text-2xl'
-          }`}
-        >
-          {post.title}
-        </h2>
+        <div className={`flex flex-col ${highlighted ? 'flex-1 p-8 border-l' : 'h-full'}`}>
+          <div className="mb-4 flex items-center justify-between gap-4">
+            <p className="text-sm font-medium text-primary">{getCategoryName(post.category)}</p>
 
-        {/* Excerpt */}
-        <p className="mb-6 line-clamp-3 text-sm leading-6 text-muted-foreground">{post.excerpt}</p>
+            <p className="shrink-0 text-sm font-medium text-muted-foreground">
+              {post.publishedAt
+                ? new Date(post.publishedAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
+                : ''}
+            </p>
+          </div>
 
-        {/* Push author to bottom */}
-        <div className="mt-auto">
-          <p className="text-sm text-muted-foreground">{getAuthorName(post.author)}</p>
+          {highlighted && (
+            <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">
+              ★ Highlight
+            </p>
+          )}
+
+          <h2
+            className={`mb-4 font-semibold leading-tight tracking-normal group-hover:underline ${
+              highlighted ? 'line-clamp-3 text-3xl md:text-4xl' : 'line-clamp-2 text-2xl'
+            }`}
+          >
+            {post.title}
+          </h2>
+
+          <p className="mb-6 line-clamp-3 text-sm leading-6 text-muted-foreground">
+            {post.excerpt}
+          </p>
+
+          <div className="mt-auto">
+            <p className="text-sm text-muted-foreground">{getAuthorName(post.author)}</p>
+          </div>
         </div>
       </article>
     </Link>
@@ -94,7 +112,7 @@ function BlogGrid({
   const regularPosts = showHighlighted ? posts.filter((p) => p.id !== highlightedPost?.id) : posts
 
   return (
-    <section className="grid  divide-x divide-y border border-border md:grid-cols-2 lg:grid-cols-3">
+    <section className="grid divide-x divide-y border border-border md:grid-cols-2 lg:grid-cols-3">
       {showHighlighted && highlightedPost && <PostCard post={highlightedPost} highlighted />}
 
       {regularPosts.map((post) => (
@@ -116,6 +134,9 @@ export default function BlogTabs({ categories, initialPosts, highlightedPost }: 
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
+  // STABLE STRING
+  const searchParamsString = useMemo(() => searchParams.toString(), [searchParams])
+
   const currentCategory = searchParams.get('category') ?? 'all'
   const currentSearch = searchParams.get('search') ?? ''
 
@@ -125,7 +146,7 @@ export default function BlogTabs({ categories, initialPosts, highlightedPost }: 
 
   const updateParams = useCallback(
     (params: { category?: string; search?: string }) => {
-      const next = new URLSearchParams(searchParams.toString())
+      const next = new URLSearchParams(searchParamsString)
 
       if (params.category !== undefined) {
         if (params.category === 'all') next.delete('category')
@@ -137,25 +158,40 @@ export default function BlogTabs({ categories, initialPosts, highlightedPost }: 
         else next.set('search', params.search)
       }
 
-      router.push(`${pathname}?${next.toString()}`, { scroll: false })
+      const nextQuery = next.toString()
+      const currentQuery = searchParamsString
+
+      const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname
+
+      const currentUrl = currentQuery ? `${pathname}?${currentQuery}` : pathname
+
+      // IMPORTANT: prevent unnecessary navigation
+      if (nextUrl === currentUrl) {
+        return
+      }
+
+      router.replace(nextUrl, { scroll: false })
     },
-    [pathname, router, searchParams],
+    [pathname, router, searchParamsString],
   )
 
-  // Debounce search  update URL
+  // Debounce search update URL
   useEffect(() => {
     const timer = setTimeout(() => {
       const parsed = searchSchema.safeParse(searchValue)
+
       if (parsed.success) {
         updateParams({ search: parsed.data })
       }
     }, 400)
+
     return () => clearTimeout(timer)
   }, [searchValue, updateParams])
 
-  // Fetch saat URL params berubah
+  // Fetch when params change
   useEffect(() => {
     let cancelled = false
+
     setLoading(true)
 
     fetchPostsAction({
@@ -163,11 +199,15 @@ export default function BlogTabs({ categories, initialPosts, highlightedPost }: 
       search: currentSearch || undefined,
     })
       .then((data) => {
-        if (!cancelled) setPosts(data)
+        if (!cancelled) {
+          setPosts(data)
+        }
       })
       .catch(console.error)
       .finally(() => {
-        if (!cancelled) setLoading(false)
+        if (!cancelled) {
+          setLoading(false)
+        }
       })
 
     return () => {
@@ -178,9 +218,9 @@ export default function BlogTabs({ categories, initialPosts, highlightedPost }: 
   return (
     <Tabs value={currentCategory} onValueChange={(value) => updateParams({ category: value })}>
       <div className="w-full flex flex-col md:flex-row gap-4">
-        {/*  search*/}
-        <div className="relative max-w-sm">
+        <div className="relative max-w-sm h-fit">
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
           <Input
             className="pl-9"
             placeholder="Search articles..."
@@ -189,15 +229,17 @@ export default function BlogTabs({ categories, initialPosts, highlightedPost }: 
             aria-label="Search posts by title"
           />
         </div>
+
+        <TabsList className="mb-6 h-auto flex-wrap gap-1" variant="line">
+          <TabsTrigger value="all">All</TabsTrigger>
+
+          {categories.map((cat) => (
+            <TabsTrigger key={cat.id} value={cat.slug}>
+              {cat.name}
+            </TabsTrigger>
+          ))}
+        </TabsList>
       </div>
-      <TabsList className="mb-6 h-auto flex-wrap gap-1" variant="line">
-        <TabsTrigger value="all">All</TabsTrigger>
-        {categories.map((cat) => (
-          <TabsTrigger key={cat.id} value={cat.slug}>
-            {cat.name}
-          </TabsTrigger>
-        ))}
-      </TabsList>
 
       <TabsContent
         value={currentCategory}

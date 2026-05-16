@@ -18,7 +18,6 @@ export function CopyButton({ code }: { code: string }) {
   return (
     <Button
       variant="ghost"
-      size="icon"
       onClick={handleCopy}
       className="flex items-center gap-1.5 cursor-pointer"
       aria-label="Copy to clipboard"

@@ -1,4 +1,4 @@
-"use client"
+'use client'
 import {
   EnvelopeIcon,
   GithubLogoIcon,
@@ -6,53 +6,47 @@ import {
   LinkedinLogoIcon,
   TiktokLogoIcon,
   WhatsappLogoIcon,
-} from "@phosphor-icons/react/ssr"
-import Link from "next/link"
-import { ThemeToggle } from "./theme-toggle"
+} from '@phosphor-icons/react/ssr'
+import Link from 'next/link'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 export const CONTACTS = [
   {
-    label: "GitHub",
-    href: "https://github.com/febriarr",
+    label: 'GitHub',
+    href: 'https://github.com/febriarr',
     icon: GithubLogoIcon,
-    value: "@febriarr",
+    value: '@febriarr',
   },
   {
-    label: "Email",
-    href: "mailto:hello.febriar@gmail.com",
+    label: 'Email',
+    href: 'mailto:hello.febriar@gmail.com',
     icon: EnvelopeIcon,
-    value: "hello.febriarr@gmail.com",
+    value: 'hello.febriarr@gmail.com',
   },
   {
-    label: "WhatsApp",
-    href: "https://wa.me/6285857912408",
+    label: 'WhatsApp',
+    href: 'https://wa.me/6285857912408',
     icon: WhatsappLogoIcon,
-    value: "+62 8585 7912 408",
+    value: '+62 8585 7912 408',
   },
   {
-    label: "LinkedIn",
-    href: "https://www.linkedin.com/in/febri-ardiansyah-a6ba1a305",
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com/in/febri-ardiansyah-a6ba1a305',
     icon: LinkedinLogoIcon,
-    value: "Febri Ardiansyah",
+    value: 'Febri Ardiansyah',
   },
   {
-    label: "Instagram",
-    href: "https://instagram.com/febriiar_",
+    label: 'Instagram',
+    href: 'https://instagram.com/febriiar_',
     icon: InstagramLogoIcon,
-    value: "@febriiar_",
+    value: '@febriiar_',
   },
   {
-    label: "TikTok",
-    href: "https://tiktok.com/@febriarrr",
+    label: 'TikTok',
+    href: 'https://tiktok.com/@febriarrr',
     icon: TiktokLogoIcon,
-    value: "@febriarrr",
+    value: '@febriarrr',
   },
-]
-
-const NAV_LINKS = [
-  { href: "#about", label: "About" },
-  { href: "#projects", label: "Projects" },
-  { href: "#contact", label: "Contact" },
 ]
 
 export function Footer() {
@@ -68,19 +62,6 @@ export function Footer() {
             From Operations to Fullstack Developer
           </p>
         </div>
-
-        {/* Center - Nav */}
-        <nav className="flex gap-6">
-          {NAV_LINKS.map(({ href, label }) => (
-            <Link
-              key={label}
-              href={href}
-              className="text-xs text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {label}
-            </Link>
-          ))}
-        </nav>
 
         {/* Right - Social */}
         <div className="flex items-center gap-3">

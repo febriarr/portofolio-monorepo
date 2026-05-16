@@ -1,60 +1,30 @@
-import { headers as getHeaders } from 'next/headers.js'
-import Image from 'next/image'
-import { getPayload } from 'payload'
-import React from 'react'
-import { fileURLToPath } from 'url'
+import React, { Suspense } from 'react'
+import { getCategories, getPublishedPosts } from '@/queries'
+import BlogTabs from '@/components/blog-tabs'
+import { Metadata } from 'next'
 
-import config from '@/payload.config'
+export const metadata: Metadata = {
+  title: 'Blog',
+  description: 'Read our latest articles and insights on various topics.',
+}
 
 export default async function HomePage() {
-  const headers = await getHeaders()
-  const payloadConfig = await config
-  const payload = await getPayload({ config: payloadConfig })
-  const { user } = await payload.auth({ headers })
+  const [categoriesResult, postsResult] = await Promise.all([
+    getCategories(),
+    getPublishedPosts({ limit: 10 }),
+  ])
 
-  const fileURL = `vscode://file/${fileURLToPath(import.meta.url)}`
+  const highlightedPost = postsResult.docs.find((p) => p.isHighlighted) ?? null
 
   return (
-    <>
-      <div className="home bg-red-500">
-        <div className="content">
-          <picture>
-            <source srcSet="https://raw.githubusercontent.com/payloadcms/payload/3.x/packages/ui/src/assets/payload-favicon.svg" />
-            <Image
-              alt="Payload Logo"
-              height={65}
-              src="https://raw.githubusercontent.com/payloadcms/payload/3.x/packages/ui/src/assets/payload-favicon.svg"
-              width={65}
-            />
-          </picture>
-          {!user && <h1>Welcome to your new project.</h1>}
-          {user && <h1>Welcome back, {user.email}</h1>}
-          <div className="links">
-            <a
-              className="admin"
-              href={payloadConfig.routes.admin}
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              Go to admin panel
-            </a>
-            <a
-              className="docs"
-              href="https://payloadcms.com/docs"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              Documentation
-            </a>
-          </div>
-        </div>
-        <div className="footer">
-          <p>Update this page by editing</p>
-          <a className="codeLink" href={fileURL}>
-            <code>app/(frontend)/page.tsx</code>
-          </a>
-        </div>
-      </div>
-    </>
+    <div className="mx-auto w-full max-w-6xl px-6 pt-6 pb-20">
+      <Suspense fallback={<div className="text-muted-foreground">Loading...</div>}>
+        <BlogTabs
+          categories={categoriesResult.docs}
+          initialPosts={postsResult.docs}
+          highlightedPost={highlightedPost}
+        />
+      </Suspense>
+    </div>
   )
 }

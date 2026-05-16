@@ -21,8 +21,8 @@ export async function CodeBlockComponent({ code, language = 'typescript', filena
   })
 
   return (
-    <div className="my-6 overflow-hidden rounded-none border border-border font-mono text-sm relative">
-      <div className="flex items-center justify-between border-b border-border bg-muted/50 px-4 py-2">
+    <div className="my-6 overflow-hidden rounded-lg border border-border text-sm relative bg-background">
+      <div className="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-2">
         <span className="text-xs text-muted-foreground">{filename ?? language}</span>
         <CopyButton code={code} />
       </div>
