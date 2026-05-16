@@ -83,7 +83,7 @@ export function Footer() {
       {/* Bottom */}
       <div className="border-t">
         <div className="container mx-auto flex flex-col gap-1 py-4 md:flex-row md:items-center md:justify-between">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground" suppressHydrationWarning>
             © {new Date().getFullYear()} Febri Ardiansyah. All rights reserved.
           </p>
           <div className="flex items-center gap-3">

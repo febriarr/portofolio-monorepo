@@ -77,7 +77,11 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
                 <SidebarMenuButton
                   tooltip={item.title}
                   asChild
-                  className={`${pathname === item.link ? "bg-primary text-primary-foreground hover:bg-primary/90" : ""}`}
+                  className={`${
+                    pathname === item.link || pathname.startsWith(item.link + '/') 
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                      : ""
+                  }`}
                 >
                   <Link href={item.link}>
                     {item.icon && <item.icon />}

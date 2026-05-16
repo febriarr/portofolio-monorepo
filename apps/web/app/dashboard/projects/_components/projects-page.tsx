@@ -74,7 +74,6 @@ export function ProjectsPage({ categoryOptions = [], techStackOptions = [] }: Pr
   const total = data?.meta?.total ?? 0
   const totalPages = Math.ceil(total / 6)
 
-  // Reset ke page 1 saat search berubah
   const handleSearch = (value: string) => {
     setSearch(value)
     setPage(1)
@@ -84,13 +83,16 @@ export function ProjectsPage({ categoryOptions = [], techStackOptions = [] }: Pr
     router.push(`/dashboard/projects/${id}`)
   }
 
+ 
   const handleEdit = (e: React.MouseEvent, project: ProjectWithMeta) => {
     e.stopPropagation()
+    e.preventDefault()
     setEditProject(project)
   }
 
   const handleDelete = (e: React.MouseEvent, project: ProjectWithMeta) => {
     e.stopPropagation()
+    e.preventDefault()
     setDeleteProject({ id: project.id, title: project.title })
   }
 
@@ -162,26 +164,29 @@ export function ProjectsPage({ categoryOptions = [], techStackOptions = [] }: Pr
           />
         )}
 
-        {/* ── Pagination ──────────────────────────────────────────────── */}
         {!isLoading && totalPages > 1 && (
           <CustomPagination page={page} totalPages={totalPages} onPageChange={setPage} />
         )}
       </div>
 
-      {/* ── Dialogs ───────────────────────────────────────────────────── */}
-      <SheetEditProject
-        project={editProject}
-        open={!!editProject}
-        onOpenChange={(open) => !open && setEditProject(null)}
-        categoryOptions={categoryOptions}
-        techStackOptions={techStackOptions}
-      />
+    
+      {editProject && (
+        <SheetEditProject
+          project={editProject}
+          open={true}
+          onOpenChange={(open) => !open && setEditProject(null)}
+          categoryOptions={categoryOptions}
+          techStackOptions={techStackOptions}
+        />
+      )}
 
-      <AlertDialogDeleteProject
-        project={deleteProject}
-        open={!!deleteProject}
-        onOpenChange={(open) => !open && setDeleteProject(null)}
-      />
+      {deleteProject && (
+        <AlertDialogDeleteProject
+          project={deleteProject}
+          open={true}
+          onOpenChange={(open) => !open && setDeleteProject(null)}
+        />
+      )}
     </>
   )
 }
@@ -288,7 +293,6 @@ function TableView({
                 })}
               </TableCell>
 
-              {/* Actions */}
               <TableCell onClick={(e) => e.stopPropagation()}>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -379,13 +383,13 @@ function GridView({
                 )}
               </div>
 
-              {/* Action menu */}
               <DropdownMenu>
-                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
                     className="size-7 shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <DotsThreeVerticalIcon className="size-4" />
                   </Button>
@@ -488,7 +492,6 @@ function CustomPagination({
   return (
     <Pagination>
       <PaginationContent>
-        {/* Prev */}
         <PaginationItem>
           <PaginationPrevious
             onClick={() => onPageChange(page - 1)}
@@ -497,7 +500,6 @@ function CustomPagination({
           />
         </PaginationItem>
 
-        {/* First page + ellipsis */}
         {showStartEllipsis && (
           <>
             <PaginationItem>
@@ -509,7 +511,6 @@ function CustomPagination({
           </>
         )}
 
-        {/* Page numbers */}
         {pageNumbers.map((p) => (
           <PaginationItem key={p}>
             <PaginationLink isActive={p === page} onClick={() => onPageChange(p)}>
@@ -518,7 +519,6 @@ function CustomPagination({
           </PaginationItem>
         ))}
 
-        {/* Last page + ellipsis */}
         {showEndEllipsis && (
           <>
             <PaginationItem>
@@ -530,7 +530,6 @@ function CustomPagination({
           </>
         )}
 
-        {/* Next */}
         <PaginationItem>
           <PaginationNext
             onClick={() => onPageChange(page + 1)}

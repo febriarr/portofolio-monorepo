@@ -8,13 +8,30 @@ export const metadata: Metadata = {
 }
 
 export default async function Page() {
-  const category = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/project-categories`)
-  const techStacks = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tech-stacks`)
-
-  const categoryOptions = await category.json()
-  const techStackOptions = await techStacks.json()
-
-  return (
-    <ProjectsPage categoryOptions={categoryOptions.data} techStackOptions={techStackOptions.data} />
-  )
+  try {
+    const [category, techStacks] = await Promise.all([
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/project-categories`, { 
+        cache: 'no-store' 
+      }),
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/tech-stacks`, { 
+        cache: 'no-store' 
+      }),
+    ])
+    
+    if (!category.ok || !techStacks.ok) throw new Error('Fetch failed')
+    
+    const [categoryData, techStackData] = await Promise.all([
+      category.json(),
+      techStacks.json(),
+    ])
+    
+    return (
+      <ProjectsPage 
+        categoryOptions={categoryData.data ?? []} 
+        techStackOptions={techStackData.data ?? []} 
+      />
+    )
+  } catch {
+    return <ProjectsPage categoryOptions={[]} techStackOptions={[]} />
+  }
 }
