@@ -88,7 +88,7 @@ export class ProjectsService
       data.images = uploaded.map((img) => ({ imageUrl: img.path }))
     }
 
-    return this.repository.create(data)
+    return this.create(data)
   }
 
   async updateWithImages(
@@ -125,7 +125,7 @@ export class ProjectsService
       data.images = uploaded.map((img) => ({ imageUrl: img.path }))
     }
 
-    return this.repository.update(id, data)
+    return this.update(id, data)
   }
 
   findBySlug(slug: string): Promise<ProjectWithMeta> {
