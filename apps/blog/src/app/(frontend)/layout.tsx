@@ -42,6 +42,9 @@ export const metadata: Metadata = {
     apple: '/apple-touch-icon.png',
   },
   metadataBase: new URL('https://blog.febriardiansyah.my.id'),
+  verification: {
+    google: 'svxHf-QT4HuW6mHAl4Tjtxo2i7h2eMbv5SRNZQLk4R0',
+  },
 }
 
 export const sora = Sora({
