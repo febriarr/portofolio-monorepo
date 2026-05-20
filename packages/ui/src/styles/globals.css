@@ -149,7 +149,7 @@
 
 .dark .shiki,
 .shiki {
-  --shiki-color-text: var(--color-muted-foreground);
+  --shiki-color-text: var(--color-foreground);
   --shiki-color-background: transparent;
   --shiki-token-constant: #52a8ff;
   --shiki-token-string: #22c55e;

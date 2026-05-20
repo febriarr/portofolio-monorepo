@@ -54,9 +54,14 @@ const jetbrainsMono = JetBrains_Mono({
   variable: '--font-mono',
 })
 
+async function getYear() {
+  'use cache'
+  return new Date().getFullYear()
+}
+
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
-
+  const year = await getYear()
   return (
     <html
       lang="en"
@@ -64,7 +69,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       className={cn('antialiased', sora.className, jetbrainsMono.variable)}
     >
       <body>
-        <Provider>{children}</Provider>
+        <Provider year={year}>{children}</Provider>
       </body>
     </html>
   )

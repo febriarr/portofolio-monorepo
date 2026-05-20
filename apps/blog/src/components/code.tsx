@@ -32,7 +32,7 @@ export async function CodeBlockComponent({ code, language = 'typescript', filena
           [&_.diff.add]:bg-green-500/15 [&_.diff.add]:relative
           [&_.diff.remove]:bg-red-500/15 [&_.diff.remove]:relative
           [&_.diff.add]:before:content-['+'] [&_.diff.add]:before:absolute [&_.diff.add]:before:left-1 [&_.diff.add]:before:text-green-400
-          [&_.diff.remove]:before:content-['-'] [&_.diff.remove]:before:absolute [&_.diff.remove]:before:left-1 [&_.diff.remove]:before:text-red-400 
+          [&_.diff.remove]:before:content-['-'] [&_.diff.remove]:before:absolute [&_.diff.remove]:before:left-1 [&_.diff.remove]:before:text-red-400 max-h-150 overflow-auto
         `}
         dangerouslySetInnerHTML={{ __html: html }}
       />

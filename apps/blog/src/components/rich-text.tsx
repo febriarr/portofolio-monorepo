@@ -3,12 +3,13 @@ import {
   type JSXConvertersFunction,
 } from '@payloadcms/richtext-lexical/react'
 import { CodeBlockComponent, type CodeBlockProps } from './code'
+import { SerializedBlockNode } from 'node_modules/@payloadcms/richtext-lexical/dist/features/blocks/server/nodes/BlocksNode'
 
 const jsxConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
   ...defaultConverters,
   blocks: {
-    code: ({ node }: { node: any }) => {
-      const { code, language, filename } = node.fields as CodeBlockProps
+    code: ({ node }: { node: SerializedBlockNode<CodeBlockProps> }) => {
+      const { code, language, filename } = node.fields
       return (
         <CodeBlockComponent
           key={node.fields.id}

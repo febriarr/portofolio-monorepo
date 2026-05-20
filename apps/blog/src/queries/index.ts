@@ -55,6 +55,7 @@ export async function getPublishedPosts(options?: {
 }
 
 export async function getCategories() {
+  'use cache'
   const res = await fetch(`${BASE_URL}/api/categories?limit=100&sort=name`, {
     next: {
       tags: ['categories'],
@@ -68,6 +69,7 @@ export async function getCategories() {
 }
 
 export async function getPostBySlug(slug: string) {
+  'use cache'
   const params = new URLSearchParams()
   params.set('depth', '2')
   params.set('limit', '1')
