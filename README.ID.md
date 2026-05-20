@@ -2,7 +2,7 @@
 
 Ini adalah project portofolio pribadi yang saya bangun dengan tujuan utama belajar dan mengimplementasikan beberapa konsep yang selama ini ingin saya eksplorasi lebih dalam — terutama OOP, Turborepo, dan Separation of Concerns.
 
-Mungkin terlihat *over-engineering* untuk sebuah portofolio. Dan jujurnya, memang iya. Tapi justru itu pointnya — saya ingin tahu bagaimana rasanya membangun sesuatu dengan arsitektur yang lebih terstruktur, bukan hanya sekedar membuat fitur jalan.
+Mungkin terlihat _over-engineering_ untuk sebuah portofolio. Dan jujurnya, memang iya. Tapi justru itu pointnya — saya ingin tahu bagaimana rasanya membangun sesuatu dengan arsitektur yang lebih terstruktur, bukan hanya sekedar membuat fitur jalan.
 
 ---
 
@@ -19,12 +19,21 @@ monorepo-portofolio/
 │   │       ├── routes/         # Route definitions
 │   │       ├── shared/         # Base classes, helpers, errors
 │   │       └── types/          # Express type extensions
-│   └── web/                    # Frontend (Next.js App Router)
-│       ├── app/                # Pages
-│       ├── components/         # UI components
-│       ├── hooks/              # Custom hooks
-│       ├── lib/                # Axios client, utilities
-│       └── services/           # API service functions
+│   ├── web/                    # Frontend (Next.js App Router)
+│   │   ├── app/                # Pages
+│   │   ├── components/         # UI components
+│   │   ├── hooks/              # Custom hooks
+│   │   ├── lib/                # Axios client, utilities
+│   │   └── services/           # API service functions
+│   └── blog/                   # Blog + CMS (Next.js + Payload CMS)
+│       └── src/
+│           ├── app/            # Pages & Payload admin panel
+│           ├── blocks/         # Definisi block Payload
+│           ├── collections/    # Payload collections (Posts, Categories, dll)
+│           ├── components/     # UI components
+│           ├── hooks/          # Custom hooks
+│           ├── queries/        # Fungsi fetching data
+│           └── utils/          # Utilities & helpers
 └── packages/
     ├── shared/                 # Shared types & interfaces
     ├── validator/              # Zod schemas
@@ -38,6 +47,7 @@ monorepo-portofolio/
 ## Tech Stack
 
 **Backend**
+
 - Express.js + TypeScript
 - Drizzle ORM + PostgreSQL (Supabase)
 - JWT Authentication (Access Token + Refresh Token)
@@ -45,13 +55,23 @@ monorepo-portofolio/
 - Winston untuk logging
 
 **Frontend**
+
 - Next.js 16 App Router
 - TanStack Query
 - React Hook Form + Zod
 - Shadcn UI + Tailwind CSS
 - Axios
 
+**Blog & CMS**
+
+- Next.js 16 App Router
+- Payload CMS 3 (headless CMS dengan admin panel bawaan)
+- PostgreSQL (Supabase)
+- Cloudflare R2 untuk media storage
+- Lexical rich text editor
+
 **Monorepo**
+
 - Turborepo
 - pnpm workspaces
 
@@ -88,10 +108,12 @@ Project ini menerapkan 4 pilar OOP secara konsisten:
 ## Menjalankan Project
 
 **Prerequisites**
+
 - Node.js 20+
 - pnpm 9+
 
 **Install dependencies**
+
 ```bash
 pnpm install
 ```
@@ -99,12 +121,15 @@ pnpm install
 **Setup environment**
 
 Copy file env contoh lalu isi dengan nilai yang sesuai:
+
 ```bash
 cp apps/api/.env.example apps/api/.env
 cp apps/web/.env.example apps/web/.env
+cp apps/blog/.env.example apps/blog/.env
 ```
 
 `apps/api/.env`
+
 ```bash
 DATABASE_URL=url-db
 DATABASE_DIRECT_URL=url-db
@@ -124,6 +149,7 @@ DOMAIN=domain-for-cookie
 ```
 
 `apps/web/.env`
+
 ```bash
 NEXT_PUBLIC_LINK_R2=public-url-platform-storage
 
@@ -135,13 +161,32 @@ NEXT_PUBLIC_API_URL=/api
 # NEXT_PUBLIC_API_URL=https://api.yourdomain.com
 ```
 
+`apps/blog/.env`
+
+```bash
+DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/blog_portofolio
+PAYLOAD_SECRET=random-string-32
+
+R2_ACCESS_KEY_ID=your-access-key
+R2_SECRET_ACCESS_KEY=your-secret-access-key
+R2_ENDPOINT=https://your-account-id.r2.cloudflarestorage.com
+R2_BUCKET=your-bucket
+R2_PUBLIC_URL=https://your-public-url
+
+NEXT_PUBLIC_SERVER_URL=http://localhost:3001
+
+NODE_ENV=development
+```
+
 **Migration & seed database**
+
 ```bash
 pnpm --filter @monorepo/api db:migrate
 pnpm --filter @monorepo/api db:seed
 ```
 
 **Jalankan semua apps**
+
 ```bash
 pnpm dev
 ```
@@ -150,9 +195,10 @@ pnpm dev
 
 ## Deploy
 
-- **Frontend** — Vercel
-- **Backend** — Railway
-- **Database** — Supabase
+- **Frontend** (`web`) — Vercel
+- **Blog & CMS** (`blog`) — Vercel
+- **Backend** (`api`) — Railway
+- **Database** — Supabase (database terpisah untuk `api` dan `blog`)
 - **File Storage** — Cloudflare R2
 
 ---
