@@ -84,17 +84,11 @@ export function Footer({ year }: { year: number }) {
       {/* Bottom */}
       <div className="border-t">
         <div className="container mx-auto flex flex-col gap-1 py-4 md:flex-row md:items-center md:justify-between">
-<<<<<<< HEAD
-          <p className="text-xs text-muted-foreground" suppressHydrationWarning>
-            © {new Date().getFullYear()} Febri Ardiansyah. All rights reserved.
-          </p>
-=======
           <Suspense fallback={null}>
             <p className="text-xs text-muted-foreground" suppressHydrationWarning>
               © {year} Febri Ardiansyah. All rights reserved.
             </p>
           </Suspense>
->>>>>>> 7e07ec1 (fix(blog): fix Error Blocking Route)
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <p className="font-mono text-xs text-muted-foreground">
