@@ -16,6 +16,13 @@ export const Users: CollectionConfig = {
     // Email added by default
     // Add more fields as needed
     {
+      name: 'email',
+      type: 'email',
+      access: {
+        read: ({ req: { user } }) => !!user,
+      },
+    },
+    {
       name: 'name',
       type: 'text',
     },
@@ -31,6 +38,18 @@ export const Users: CollectionConfig = {
       name: 'avatar',
       type: 'upload',
       relationTo: 'media',
+    },
+    {
+      name: 'sessions',
+      type: 'array',
+      access: {
+        read: ({ req: { user } }) => !!user,
+      },
+      fields: [
+        { name: 'id', type: 'text' },
+        { name: 'createdAt', type: 'date' },
+        { name: 'expiresAt', type: 'date' },
+      ],
     },
   ],
 }

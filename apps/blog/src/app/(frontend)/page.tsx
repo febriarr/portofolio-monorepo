@@ -22,6 +22,8 @@ export default async function HomePage() {
     return <div className={'text-center'}>No Content found.</div>
   }
 
+  console.log(postsResult.docs)
+
   const highlightedPost = postsResult.docs.find((p) => p.isHighlighted) ?? null
 
   return (
