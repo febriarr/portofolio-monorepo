@@ -49,22 +49,24 @@ export const getCategories = unstable_cache(
   { tags: ['categories'] },
 )
 
-export const getPostBySlug = unstable_cache(
-  async (slug: string) => {
-    const payload = await getPayloadClient()
+export const getPostBySlug = (slug: string) =>
+  unstable_cache(
+    async () => {
+      const payload = await getPayloadClient()
 
-    const result = await payload.find({
-      collection: 'posts',
-      depth: 2,
-      limit: 1,
-      where: {
-        slug: { equals: slug },
-        _status: { equals: 'published' },
-      },
-    })
+      const result = await payload.find({
+        collection: 'posts',
+        depth: 2,
+        limit: 1,
+        overrideAccess: true,
+        where: {
+          slug: { equals: slug },
+          _status: { equals: 'published' },
+        },
+      })
 
-    return result.docs[0] ?? null
-  },
-  ['post-by-slug'],
-  { tags: ['posts'] },
-)
+      return result.docs[0] ?? null
+    },
+    [`post-by-slug-${slug}`],
+    { tags: ['posts', `post-${slug}`] },
+  )()

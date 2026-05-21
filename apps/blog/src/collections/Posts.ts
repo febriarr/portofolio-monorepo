@@ -43,6 +43,13 @@ export const Posts: CollectionConfig = {
         return data
       },
     ],
+    afterDelete: [
+      ({ doc }) => {
+        revalidateTag('posts', 'max')
+        revalidateTag(`post-${doc.slug}`, 'max')
+        return doc
+      },
+    ],
   },
   fields: [
     {
