@@ -2,7 +2,6 @@ import React, { Suspense } from 'react'
 import { getCategories, getPublishedPosts } from '@/queries'
 import BlogTabs from '@/components/blog-tabs'
 import { Metadata } from 'next'
-import { cacheTag } from 'next/cache'
 import { BlogListSkeleton } from '@/components/blog-list-skeleton'
 
 export const metadata: Metadata = {
@@ -11,8 +10,6 @@ export const metadata: Metadata = {
 }
 
 export default async function HomePage() {
-  'use cache'
-  cacheTag('posts', 'categories')
   const [categoriesResult, postsResult] = await Promise.all([
     getCategories(),
     getPublishedPosts({ limit: 10 }),
