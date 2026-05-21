@@ -75,6 +75,6 @@ export default buildConfig({
       },
     }),
   ],
-  cors: ['https://blog.febriardiansyah.my.id'],
-  csrf: ['https://blog.febriardiansyah.my.id'],
+  cors: ['https://blog.febriardiansyah.my.id', 'http://localhost:3001'],
+  csrf: ['https://blog.febriardiansyah.my.id', 'http://localhost:3001'],
 })

@@ -1,89 +1,70 @@
-import { Category, Post } from '@/payload-types'
+import { getPayload } from 'payload'
+import config from '@payload-config'
+import { unstable_cache } from 'next/cache'
 
-const BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3001'
+const getPayloadClient = () => getPayload({ config })
 
-function buildPostsUrl(options?: {
-  categorySlug?: string
-  search?: string
-  limit?: number
-  page?: number
-}) {
-  const { categorySlug, search, limit = 12, page = 1 } = options ?? {}
-  const params = new URLSearchParams()
+export const getPublishedPosts = unstable_cache(
+  async (options?: { categorySlug?: string; search?: string; limit?: number; page?: number }) => {
+    const { categorySlug, search, limit = 12, page = 1 } = options ?? {}
+    const payload = await getPayloadClient()
 
-  params.set('depth', '2')
-  params.set('limit', String(limit))
-  params.set('page', String(page))
-  params.set('sort', '-publishedAt')
-  params.set('where[_status][equals]', 'published')
+    const result = await payload.find({
+      collection: 'posts',
+      depth: 2,
+      limit,
+      page,
+      sort: '-publishedAt',
+      where: {
+        _status: { equals: 'published' },
+        ...(categorySlug &&
+          categorySlug !== 'all' && {
+            'category.slug': { equals: categorySlug },
+          }),
+        ...(search && {
+          title: { like: search },
+        }),
+      },
+    })
 
-  if (categorySlug && categorySlug !== 'all') {
-    params.set('where[category.slug][equals]', categorySlug)
-  }
+    return result
+  },
+  ['published-posts'],
+  { tags: ['posts'] },
+)
 
-  if (search) {
-    params.set('where[title][like]', search)
-  }
+export const getCategories = unstable_cache(
+  async () => {
+    const payload = await getPayloadClient()
 
-  return `${BASE_URL}/api/posts?${params.toString()}`
-}
+    const result = await payload.find({
+      collection: 'categories',
+      limit: 100,
+      sort: 'name',
+    })
 
-export async function getPublishedPosts(options?: {
-  categorySlug?: string
-  search?: string
-  limit?: number
-  page?: number
-}) {
-  const url = buildPostsUrl(options)
+    return result
+  },
+  ['categories'],
+  { tags: ['categories'] },
+)
 
-  const res = await fetch(url, {
-    next: {
-      tags: ['posts'],
-    },
-  })
+export const getPostBySlug = unstable_cache(
+  async (slug: string) => {
+    const payload = await getPayloadClient()
 
-  if (!res.ok) throw new Error('Failed to fetch posts')
+    const result = await payload.find({
+      collection: 'posts',
+      depth: 2,
+      limit: 1,
+      where: {
+        slug: { equals: slug },
+        _status: { equals: 'published' },
+      },
+    })
 
-  return res.json() as Promise<{
-    docs: Post[]
-    totalDocs: number
-    totalPages: number
-    hasNextPage: boolean
-    nextPage: number | null
-    page: number
-  }>
-}
-
-export async function getCategories() {
-  'use cache'
-  const res = await fetch(`${BASE_URL}/api/categories?limit=100&sort=name`, {
-    next: {
-      tags: ['categories'],
-    },
-  })
-
-  if (!res.ok) throw new Error('Failed to fetch categories')
-
-  const data = await res.json()
-  return data as { docs: Category[] }
-}
-
-export async function getPostBySlug(slug: string) {
-  'use cache'
-  const params = new URLSearchParams()
-  params.set('depth', '2')
-  params.set('limit', '1')
-  params.set('where[slug][equals]', slug)
-  params.set('where[_status][equals]', 'published')
-
-  const res = await fetch(`${BASE_URL}/api/posts?${params.toString()}`, {
-    next: {
-      tags: [`post-${slug}`],
-    },
-  })
-
-  if (!res.ok) throw new Error('Failed to fetch post')
-
-  const data = await res.json()
-  return data.docs[0] as Post | undefined
-}
+    return result.docs[0] ?? null
+  },
+  ['post-by-slug'],
+  { tags: ['posts'] },
+)

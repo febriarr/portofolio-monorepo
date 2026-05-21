@@ -10,7 +10,7 @@ export async function fetchPostsAction(options: {
 }): Promise<{
   posts: Post[]
   hasNextPage: boolean
-  nextPage: number | null
+  nextPage?: number | null
 }> {
   const result = await getPublishedPosts({ ...options, limit: 10 })
   return {
