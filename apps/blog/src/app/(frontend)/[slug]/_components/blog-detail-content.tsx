@@ -3,6 +3,7 @@ import { getPostBySlug } from '@/queries'
 import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar'
 import { TypographySmall } from '@workspace/ui/components/typography'
+import Image from 'next/image'
 
 type Args = {
   params: Promise<{ slug: string }>
@@ -17,7 +18,7 @@ export default async function BlogDetailContent({ params }: Args) {
   }
 
   return (
-    <article className="mx-auto w-full max-w-6xl px-4 md:px-6 lg:px-16 pt-6 pb-20 border border-border relative">
+    <article className="mx-auto w-full max-w-5xl px-4 md:px-6 lg:px-16 pt-6 pb-20 border border-border relative">
       <div className="absolute inset-0 -z-10 w-full h-full grid grid-cols-3 divide-x divide-dashed pointer-events-none">
         <div></div>
         <div></div>
@@ -58,6 +59,19 @@ export default async function BlogDetailContent({ params }: Args) {
             </div>
           ) : null}
         </header>
+
+        {typeof post.heroImage === 'object' && post.heroImage?.url ? (
+          <div className="w-full flex justify-center mb-8 md:mb-12">
+            <Image
+              src={post.heroImage.url}
+              alt={post.heroImage.alt ?? post.title}
+              width={post.heroImage.width ?? 1200}
+              height={post.heroImage.height ?? 630}
+              className="w-full object-contain h-auto border rounded-xl"
+              priority
+            />
+          </div>
+        ) : null}
 
         <div className="prose prose-invert max-w-none prose-headings:tracking-normal prose-a:text-primary prose-blockquote:border-primary">
           <RichText data={post.content} />
