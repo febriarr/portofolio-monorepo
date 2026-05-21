@@ -83,9 +83,6 @@ export const getPostBySlug = (slug: string) =>
           _status: { equals: 'published' },
         },
       })
-      console.log('result', result.docs[0])
-      console.log('result conttent', result.docs[0].content)
-      console.log('slug', `post-${slug}`)
 
       const post = result.docs[0] ?? null
       return post ? sanitizePost(post) : null

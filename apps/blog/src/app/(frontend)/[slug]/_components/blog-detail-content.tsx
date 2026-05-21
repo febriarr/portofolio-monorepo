@@ -16,8 +16,6 @@ export default async function BlogDetailContent({ params }: Args) {
     return <div className="text-center">Post Not Found.</div>
   }
 
-  console.log(post)
-
   return (
     <article className="mx-auto w-full max-w-6xl px-4 md:px-6 lg:px-16 pt-6 pb-20 border border-border relative">
       <div className="absolute inset-0 -z-10 w-full h-full grid grid-cols-3 divide-x divide-dashed pointer-events-none">
