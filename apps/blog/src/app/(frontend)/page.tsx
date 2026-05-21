@@ -3,6 +3,7 @@ import { getCategories, getPublishedPosts } from '@/queries'
 import BlogTabs from '@/components/blog-tabs'
 import { Metadata } from 'next'
 import { cacheTag } from 'next/cache'
+import { BlogListSkeleton } from '@/components/blog-list-skeleton'
 
 export const metadata: Metadata = {
   title: 'Blog',
@@ -25,7 +26,7 @@ export default async function HomePage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-6 pt-6 pb-20">
-      <Suspense fallback={<div className="text-muted-foreground">Loading...</div>}>
+      <Suspense fallback={<BlogListSkeleton />}>
         <BlogTabs
           categories={categoriesResult.docs}
           initialPosts={postsResult.docs}

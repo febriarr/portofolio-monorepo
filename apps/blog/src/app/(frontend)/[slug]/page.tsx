@@ -2,6 +2,7 @@ import { getPostBySlug } from '@/queries'
 import { Metadata } from 'next'
 import { Suspense } from 'react'
 import BlogDetailContent from './_components/blog-detail-content'
+import { BlogDetailSkeleton } from '@/components/blog-detail-skeleton'
 
 type Args = {
   params: Promise<{ slug: string }>
@@ -47,7 +48,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
 
 export default async function BlogDetailPage({ params }: Args) {
   return (
-    <Suspense fallback={<div className="text-center">Loading...</div>}>
+    <Suspense fallback={<BlogDetailSkeleton />}>
       <BlogDetailContent params={params} />
     </Suspense>
   )
