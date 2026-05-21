@@ -120,7 +120,7 @@ function BlogGrid({
       ))}
 
       {posts.length === 0 && (
-        <div className="col-span-1 flex min-h-[300px] items-center justify-center p-6 text-muted-foreground md:col-span-2 lg:col-span-3">
+        <div className="col-span-1 flex min-h-75 items-center justify-center p-6 text-muted-foreground md:col-span-2 lg:col-span-3">
           No posts found.
         </div>
       )}
@@ -202,7 +202,7 @@ export default function BlogTabs({
         if (!cancelled) {
           setPosts(data)
           setHasNextPage(hnp)
-          setNextPage(np)
+          setNextPage(np ?? null)
         }
       })
       .catch(console.error)
@@ -233,7 +233,7 @@ export default function BlogTabs({
 
       setPosts((prev) => [...prev, ...morePosts])
       setHasNextPage(hnp)
-      setNextPage(np)
+      setNextPage(np ?? null)
     } catch (err) {
       console.error(err)
     } finally {
