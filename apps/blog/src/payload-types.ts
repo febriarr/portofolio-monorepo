@@ -131,6 +131,7 @@ export interface User {
   id: number;
   name?: string | null;
   bio?: string | null;
+  instagram?: string | null;
   avatar?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
@@ -335,6 +336,7 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
   bio?: T;
+  instagram?: T;
   avatar?: T;
   updatedAt?: T;
   createdAt?: T;

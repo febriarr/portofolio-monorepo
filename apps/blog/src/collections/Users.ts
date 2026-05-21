@@ -6,6 +6,12 @@ export const Users: CollectionConfig = {
     useAsTitle: 'email',
   },
   auth: true,
+  access: {
+    read: () => true,
+    update: ({ req: { user } }) => !!user,
+    create: ({ req: { user } }) => !!user,
+    delete: ({ req: { user } }) => !!user,
+  },
   fields: [
     // Email added by default
     // Add more fields as needed
@@ -16,6 +22,10 @@ export const Users: CollectionConfig = {
     {
       name: 'bio',
       type: 'textarea',
+    },
+    {
+      name: 'instagram',
+      type: 'text',
     },
     {
       name: 'avatar',
