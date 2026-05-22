@@ -1,7 +1,7 @@
 import { formatSlug } from '@/utils/format-slug'
 import { CollectionConfig } from 'payload'
 import { handleIsHighlighted } from '@/hooks/isHighlight'
-import { revalidateTag } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -19,9 +19,13 @@ export const Posts: CollectionConfig = {
   },
   hooks: {
     afterChange: [
-      ({ doc }) => {
+      ({ doc, previousDoc }) => {
         revalidateTag('posts', 'max')
-        revalidateTag(`post-${doc.slug}`, 'max')
+        revalidatePath('/')
+        if (doc?.slug) revalidatePath(`/${doc.slug}`)
+        if (previousDoc?.slug && previousDoc.slug !== doc?.slug) {
+          revalidatePath(`/${previousDoc.slug}`)
+        }
         return doc
       },
     ],
@@ -46,7 +50,8 @@ export const Posts: CollectionConfig = {
     afterDelete: [
       ({ doc }) => {
         revalidateTag('posts', 'max')
-        revalidateTag(`post-${doc.slug}`, 'max')
+        revalidatePath('/')
+        if (doc?.slug) revalidatePath(`/${doc.slug}`)
         return doc
       },
     ],

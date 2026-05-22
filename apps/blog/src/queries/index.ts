@@ -21,62 +21,81 @@ function sanitizePost(post: Post): Post {
   }
 }
 
-export const getPostBySlug = (slug: string) =>
-  unstable_cache(
-    async () => {
-      const payload = await getPayloadClient()
-      const result = await payload.find({
-        collection: 'posts',
-        depth: 2,
-        limit: 1,
-        overrideAccess: false,
-        where: {
-          slug: { equals: slug },
-          _status: { equals: 'published' },
-        },
-      })
-      const post = result.docs[0] ?? null
-      return post ? sanitizePost(post) : null
-    },
-    [`post-by-slug-${slug}`],
-    { tags: ['posts', `post-${slug}`] },
-  )()
+const cachedGetPostBySlug = unstable_cache(
+  async (slug: string) => {
+    const payload = await getPayloadClient()
+    const result = await payload.find({
+      collection: 'posts',
+      depth: 2,
+      limit: 1,
+      overrideAccess: true,
+      where: {
+        slug: { equals: slug },
+        _status: { equals: 'published' },
+      },
+    })
+    const post = result.docs[0] ?? null
+    return post ? sanitizePost(post) : null
+  },
+  ['post-by-slug'],
+  { tags: ['posts'] },
+)
 
-export const getPublishedPosts = (options?: {
+export const getPostBySlug = (slug: string) => cachedGetPostBySlug(slug)
+
+type PublishedPostsOptions = {
   categorySlug?: string
   search?: string
   limit?: number
   page?: number
-}) => {
-  const { categorySlug, search, limit = 12, page = 1 } = options ?? {}
+}
 
-  return unstable_cache(
-    async () => {
-      const payload = await getPayloadClient()
-      const result = await payload.find({
-        collection: 'posts',
-        depth: 2,
-        limit,
-        page,
-        sort: '-publishedAt',
-        overrideAccess: false,
-        where: {
-          _status: { equals: 'published' },
-          ...(categorySlug &&
-            categorySlug !== 'all' && {
-              'category.slug': { equals: categorySlug },
-            }),
-          ...(search && { title: { like: search } }),
-        },
-      })
-      return {
-        ...result,
-        docs: result.docs.map(sanitizePost),
-      }
+const cachedGetPublishedPosts = unstable_cache(
+  async (options: PublishedPostsOptions) => {
+    const { categorySlug, search, limit = 12, page = 1 } = options
+    const payload = await getPayloadClient()
+    const result = await payload.find({
+      collection: 'posts',
+      depth: 2,
+      limit,
+      page,
+      sort: '-publishedAt',
+      overrideAccess: true,
+      where: {
+        _status: { equals: 'published' },
+        ...(categorySlug &&
+          categorySlug !== 'all' && {
+            'category.slug': { equals: categorySlug },
+          }),
+        ...(search && { title: { like: search } }),
+      },
+    })
+    return {
+      ...result,
+      docs: result.docs.map(sanitizePost),
+    }
+  },
+  ['published-posts'],
+  { tags: ['posts'] },
+)
+
+export const getPublishedPosts = (options?: PublishedPostsOptions) =>
+  cachedGetPublishedPosts(options ?? {})
+
+export async function getAllPublishedSlugs(): Promise<string[]> {
+  const payload = await getPayloadClient()
+  const result = await payload.find({
+    collection: 'posts',
+    depth: 0,
+    limit: 1000,
+    pagination: false,
+    overrideAccess: true,
+    where: {
+      _status: { equals: 'published' },
     },
-    [`published-posts-${categorySlug}-${search}-${limit}-${page}`],
-    { tags: ['posts'] },
-  )()
+    select: { slug: true },
+  })
+  return result.docs.map((p) => p.slug).filter((s): s is string => Boolean(s))
 }
 
 export const getCategories = unstable_cache(

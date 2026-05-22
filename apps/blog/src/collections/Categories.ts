@@ -1,6 +1,6 @@
 import { formatSlug } from '@/utils/format-slug'
 import { CollectionConfig } from 'payload'
-import { revalidateTag } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 
 export const Categories: CollectionConfig = {
   slug: 'categories',
@@ -17,6 +17,7 @@ export const Categories: CollectionConfig = {
     afterChange: [
       ({ doc }) => {
         revalidateTag('categories', 'max')
+        revalidatePath('/')
         return doc
       },
     ],

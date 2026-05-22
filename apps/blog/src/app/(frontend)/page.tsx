@@ -1,8 +1,8 @@
-import React, { Suspense } from 'react'
+import { Suspense } from 'react'
 import { getCategories, getPublishedPosts } from '@/queries'
 import BlogTabs from '@/components/blog-tabs'
-import { Metadata } from 'next'
 import { BlogListSkeleton } from '@/components/blog-list-skeleton'
+import { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Blog',
