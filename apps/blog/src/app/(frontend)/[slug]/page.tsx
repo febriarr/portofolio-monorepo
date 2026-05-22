@@ -1,4 +1,4 @@
-import { getPostBySlug } from '@/queries'
+import { getPostBySlug, getPublishedPosts } from '@/queries'
 import { Metadata } from 'next'
 import { Suspense } from 'react'
 import BlogDetailContent from './_components/blog-detail-content'
