@@ -9,7 +9,7 @@ import { BrainIcon, GithubLogoIcon } from '@phosphor-icons/react'
 import { Button } from '@workspace/ui/components/button'
 import { Footer } from './footer'
 
-export default function Provider({ children, year }: { children?: React.ReactNode; year: number }) {
+export default function Provider({ children }: { children?: React.ReactNode }) {
   return (
     <>
       <ThemeProvider>
@@ -35,7 +35,7 @@ export default function Provider({ children, year }: { children?: React.ReactNod
             </div>
           </div>
           <main>{children}</main>
-          <Footer year={year} />
+          <Footer />
         </TooltipProvider>
       </ThemeProvider>
     </>

@@ -9,7 +9,6 @@ import {
 } from '@phosphor-icons/react/ssr'
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/theme-toggle'
-import { Suspense } from 'react'
 
 export const CONTACTS = [
   {
@@ -50,7 +49,7 @@ export const CONTACTS = [
   },
 ]
 
-export function Footer({ year }: { year: number }) {
+export function Footer() {
   return (
     <footer className="w-full border-t">
       <div className="container mx-auto flex flex-col gap-6 py-8 md:flex-row md:items-center md:justify-between">
@@ -84,11 +83,10 @@ export function Footer({ year }: { year: number }) {
       {/* Bottom */}
       <div className="border-t">
         <div className="container mx-auto flex flex-col gap-1 py-4 md:flex-row md:items-center md:justify-between">
-          <Suspense fallback={null}>
-            <p className="text-xs text-muted-foreground" suppressHydrationWarning>
-              © {year} Febri Ardiansyah. All rights reserved.
-            </p>
-          </Suspense>
+          <p className="text-xs text-muted-foreground" suppressHydrationWarning>
+            © {new Date().getFullYear()} Febri Ardiansyah. All rights reserved.
+          </p>
+
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <p className="font-mono text-xs text-muted-foreground">
