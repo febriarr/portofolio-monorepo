@@ -3,6 +3,7 @@ import { getProjects } from "@/services/ssr"
 import { ProjectsSection } from "@/components/layouts/projects-section"
 import { ApiResponse, ProjectWithMeta } from "@workspace/shared"
 import { ProjectsMeta } from "@/services/projects-service"
+import { notFound } from "next/navigation"
 
 export const metadata: Metadata = {
   title: "Projects ",
@@ -18,11 +19,13 @@ export default async function ProjectsPage() {
     console.error("[ProjectsPage] Failed to fetch projects:", error)
   }
 
+  if (!projects) return notFound()
+
   return (
     <div className="flex min-h-dvh w-full items-center justify-center">
       <div className="container">
         <h1 className="sr-only">Projects</h1>
-        <ProjectsSection initialData={projects ?? undefined} />
+        <ProjectsSection initialData={projects} />
       </div>
     </div>
   )

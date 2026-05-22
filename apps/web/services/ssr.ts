@@ -1,46 +1,96 @@
 import { ApiResponse, ProjectWithMeta, TechStackDetails } from "@workspace/shared"
 import { ProjectsMeta } from "@/services/projects-service"
 
-export async function getTechStacksSSR(): Promise<TechStackDetails[]> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL!}/tech-stacks`, {
-    next: {
-      revalidate: 60 * 60 * 3,
-    },
-  })
-  const data = await res.json()
+const API_URL = process.env.NEXT_PUBLIC_API_URL
 
-  return data.data
+if (!API_URL) {
+  throw new Error("NEXT_PUBLIC_API_URL is not defined")
 }
 
-export async function getProjects(params?: Record<string, string | number>) {
-  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL!}/projects`)
-  if (params) {
-    Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, String(v)))
+export async function getTechStacksSSR(): Promise<TechStackDetails[] | null> {
+  try {
+    const res = await fetch(`${API_URL}/tech-stacks`, {
+      next: {
+        revalidate: 60 * 60 * 3,
+      },
+    })
+
+    if (!res.ok) {
+      return null
+    }
+
+    const data: ApiResponse<TechStackDetails[]> = await res.json()
+
+    return data.data ?? []
+  } catch (error) {
+    console.error("getTechStacksSSR error:", error)
+
+    return null
   }
-
-  const res = await fetch(url.toString(), {
-    next: { revalidate: 60 * 60 * 3 },
-  })
-
-  if (!res.ok) throw new Error("Failed to fetch projects")
-
-  return res.json() as Promise<ApiResponse<ProjectWithMeta[]> & { meta: ProjectsMeta }>
 }
 
-export async function getProjectById(id: number) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL!}/projects/${id}`, {
-    next: { revalidate: 60 * 60 * 3 },
-  })
+export async function getProjects(
+  params?: Record<string, string | number>
+): Promise<(ApiResponse<ProjectWithMeta[]> & { meta: ProjectsMeta }) | null> {
+  try {
+    const url = new URL(`${API_URL}/projects`)
 
-  if (!res.ok) throw new Error("Failed to fetch project")
+    if (params) {
+      Object.entries(params).forEach(([k, v]) => {
+        url.searchParams.set(k, String(v))
+      })
+    }
 
-  return res.json() as Promise<ApiResponse<ProjectWithMeta>>
+    const res = await fetch(url.toString(), {
+      next: { revalidate: 60 * 60 * 3 },
+    })
+
+    if (!res.ok) {
+      return null
+    }
+
+    return await res.json()
+  } catch (error) {
+    console.error("getProjects error:", error)
+
+    return null
+  }
 }
 
-export async function getProjectBySlug(slug: string): Promise<ProjectWithMeta> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL!}/projects/slug/${slug}`)
-  const data = await res.json()
-  if (!res.ok) throw new Error("Failed to fetch project")
+export async function getProjectById(id: number): Promise<ApiResponse<ProjectWithMeta> | null> {
+  try {
+    const res = await fetch(`${API_URL}/projects/${id}`, {
+      next: { revalidate: 60 * 60 * 3 },
+    })
 
-  return data.data as ProjectWithMeta
+    if (!res.ok) {
+      return null
+    }
+
+    return await res.json()
+  } catch (error) {
+    console.error("getProjectById error:", error)
+
+    return null
+  }
+}
+
+export async function getProjectBySlug(slug: string): Promise<ProjectWithMeta | null> {
+  try {
+    const res = await fetch(`${API_URL}/projects/slug/${slug}`, {
+      next: { revalidate: 60 * 60 * 3 },
+    })
+
+    if (!res.ok) {
+      return null
+    }
+
+    const data: ApiResponse<ProjectWithMeta> = await res.json()
+
+    return data.data as ProjectWithMeta
+  } catch (error) {
+    console.error("getProjectBySlug error:", error)
+
+    return null
+  }
 }

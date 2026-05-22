@@ -1,6 +1,6 @@
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { cacheTag } from 'next/cache'
+import { unstable_cache } from 'next/cache'
 import type { Post } from '@/payload-types'
 
 const getPayloadClient = () => getPayload({ config })
@@ -21,71 +21,74 @@ function sanitizePost(post: Post): Post {
   }
 }
 
-export async function getPostBySlug(slug: string) {
-  'use cache'
-  cacheTag('posts', `post-${slug}`)
-
-  const payload = await getPayloadClient()
-  const result = await payload.find({
-    collection: 'posts',
-    depth: 2,
-    limit: 1,
-    overrideAccess: false,
-    where: {
-      slug: { equals: slug },
-      _status: { equals: 'published' },
+export const getPostBySlug = (slug: string) =>
+  unstable_cache(
+    async () => {
+      const payload = await getPayloadClient()
+      const result = await payload.find({
+        collection: 'posts',
+        depth: 2,
+        limit: 1,
+        overrideAccess: false,
+        where: {
+          slug: { equals: slug },
+          _status: { equals: 'published' },
+        },
+      })
+      const post = result.docs[0] ?? null
+      return post ? sanitizePost(post) : null
     },
-  })
+    [`post-by-slug-${slug}`],
+    { tags: ['posts', `post-${slug}`] },
+  )()
 
-  const post = result.docs[0] ?? null
-  return post ? sanitizePost(post) : null
-}
-
-export async function getPublishedPosts(options?: {
+export const getPublishedPosts = (options?: {
   categorySlug?: string
   search?: string
   limit?: number
   page?: number
-}) {
-  'use cache'
-  cacheTag('posts')
-
+}) => {
   const { categorySlug, search, limit = 12, page = 1 } = options ?? {}
-  const payload = await getPayloadClient()
 
-  const result = await payload.find({
-    collection: 'posts',
-    depth: 2,
-    limit,
-    page,
-    sort: '-publishedAt',
-    overrideAccess: false,
-    where: {
-      _status: { equals: 'published' },
-      ...(categorySlug &&
-        categorySlug !== 'all' && {
-          'category.slug': { equals: categorySlug },
-        }),
-      ...(search && { title: { like: search } }),
+  return unstable_cache(
+    async () => {
+      const payload = await getPayloadClient()
+      const result = await payload.find({
+        collection: 'posts',
+        depth: 2,
+        limit,
+        page,
+        sort: '-publishedAt',
+        overrideAccess: false,
+        where: {
+          _status: { equals: 'published' },
+          ...(categorySlug &&
+            categorySlug !== 'all' && {
+              'category.slug': { equals: categorySlug },
+            }),
+          ...(search && { title: { like: search } }),
+        },
+      })
+      return {
+        ...result,
+        docs: result.docs.map(sanitizePost),
+      }
     },
-  })
-
-  return {
-    ...result,
-    docs: result.docs.map(sanitizePost),
-  }
+    [`published-posts-${categorySlug}-${search}-${limit}-${page}`],
+    { tags: ['posts'] },
+  )()
 }
 
-export async function getCategories() {
-  'use cache'
-  cacheTag('categories')
-
-  const payload = await getPayloadClient()
-  const result = await payload.find({
-    collection: 'categories',
-    limit: 100,
-    sort: 'name',
-  })
-
-  return result
-}
+export const getCategories = unstable_cache(
+  async () => {
+    const payload = await getPayloadClient()
+    const result = await payload.find({
+      collection: 'categories',
+      limit: 100,
+      sort: 'name',
+    })
+    return result
+  },
+  ['categories'],
+  { tags: ['categories'] },
+)

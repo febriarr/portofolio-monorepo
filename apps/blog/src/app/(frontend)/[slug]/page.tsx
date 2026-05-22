@@ -1,15 +1,8 @@
-import { getPostBySlug, getPublishedPosts } from '@/queries'
+import { getPostBySlug } from '@/queries'
 import { Metadata } from 'next'
 import { Suspense } from 'react'
 import BlogDetailContent from './_components/blog-detail-content'
 import { BlogDetailSkeleton } from '@/components/blog-detail-skeleton'
-
-
-export async function generateStaticParams() {
-  const result = await getPublishedPosts({ limit: 1000 })
-  return result.docs.map((post) => ({ slug: post.slug }))
-}
-
 
 type Args = {
   params: Promise<{ slug: string }>
