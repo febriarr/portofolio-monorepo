@@ -4,6 +4,8 @@ import { Suspense } from 'react'
 import BlogDetailContent from './_components/blog-detail-content'
 import { BlogDetailSkeleton } from '@/components/blog-detail-skeleton'
 
+export const dynamicParams = true
+
 type Args = {
   params: Promise<{ slug: string }>
 }
