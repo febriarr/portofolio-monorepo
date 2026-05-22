@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar'
 import { TypographySmall } from '@workspace/ui/components/typography'
 import Image from 'next/image'
+import { Post } from '@/payload-types'
 
 type Args = {
   params: Promise<{ slug: string }>
@@ -11,7 +12,12 @@ type Args = {
 
 export default async function BlogDetailContent({ params }: Args) {
   const { slug } = await params
-  const post = await getPostBySlug(slug)
+  let post: Post | null = null
+  try {
+    post = await getPostBySlug(slug)
+  } catch (error) {
+    console.log(error)
+  }
 
   if (!post) {
     return <div className="text-center">Post Not Found.</div>
