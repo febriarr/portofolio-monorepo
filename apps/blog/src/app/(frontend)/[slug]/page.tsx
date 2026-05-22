@@ -6,6 +6,12 @@ import { BlogDetailSkeleton } from '@/components/blog-detail-skeleton'
 
 export const dynamicParams = true
 
+export async function generateStaticParams() {
+  const result = await getPublishedPosts({ limit: 1000 })
+  return result.docs.map((post) => ({ slug: post.slug }))
+}
+
+
 type Args = {
   params: Promise<{ slug: string }>
 }
