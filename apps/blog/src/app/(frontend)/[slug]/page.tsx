@@ -4,7 +4,6 @@ import { Suspense } from 'react'
 import BlogDetailContent from './_components/blog-detail-content'
 import { BlogDetailSkeleton } from '@/components/blog-detail-skeleton'
 
-export const dynamicParams = true
 
 export async function generateStaticParams() {
   const result = await getPublishedPosts({ limit: 1000 })
