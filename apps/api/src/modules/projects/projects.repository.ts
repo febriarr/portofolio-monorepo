@@ -7,7 +7,14 @@ import { eq, ilike, inArray, SQL } from "drizzle-orm"
 import { QueryHelper } from "@/shared/helpers/query-helper"
 import { NotFoundError } from "@/shared/errors/custom-error"
 import { IProjectsRepository } from "@/modules/projects/projects.interface"
-import { id } from "zod/locales"
+
+type CreateProjectRepositoryPayload = Omit<CreateProject, "slug"> & {
+  slug: string
+}
+
+type UpdateProjectRepositoryPayload = Omit<UpdateProject, "slug"> & {
+  slug?: string
+}
 
 export class ProjectsRepository
   extends BaseRepository<
@@ -26,7 +33,7 @@ export class ProjectsRepository
   }
 
   // Override karena butuh transaction + insert pivot tables
-  override async create(payload: CreateProject): Promise<Project> {
+  override async create(payload: CreateProjectRepositoryPayload): Promise<Project> {
     return this.database.transaction(async (tx) => {
       const { techStackIds, images, ...projectPayload } = payload
 
@@ -53,7 +60,7 @@ export class ProjectsRepository
   }
 
   // Override karena butuh transaction + delete-reinsert pivot tables
-  override async update(id: number, payload: UpdateProject): Promise<Project> {
+  override async update(id: number, payload: UpdateProjectRepositoryPayload): Promise<Project> {
     return this.database.transaction(async (tx) => {
       const { images, techStackIds, deletedImagePaths, ...projectPayload } = payload
 
@@ -171,7 +178,7 @@ export class ProjectsRepository
       },
     })
 
-    if (!project) throw new NotFoundError(`Project with id ${id} not found`)
+    if (!project) throw new NotFoundError(`Project with slug ${slug} not found`)
 
     return project
   }
