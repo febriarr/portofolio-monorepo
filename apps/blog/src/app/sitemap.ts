@@ -1,33 +1,25 @@
 import type { MetadataRoute } from 'next'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
-import { unstable_cache } from 'next/cache'
 
 const baseUrl = 'https://blog.febriardiansyah.my.id'
 
-const getSitemapPosts = unstable_cache(
-  async () => {
-    const payload = await getPayload({ config: configPromise })
-    const result = await payload.find({
-      collection: 'posts',
-      depth: 0,
-      pagination: false,
-      overrideAccess: true,
-      where: {
-        _status: { equals: 'published' },
-      },
-      select: { slug: true, updatedAt: true },
-    })
-    return result.docs
-  },
-  ['sitemap-posts'],
-  { tags: ['posts'] },
-)
+export const revalidate = 3600 // revalidate setiap 1 jam
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const posts = await getSitemapPosts()
+  const payload = await getPayload({ config: configPromise })
+  const result = await payload.find({
+    collection: 'posts',
+    depth: 0,
+    pagination: false,
+    overrideAccess: true,
+    where: {
+      _status: { equals: 'published' },
+    },
+    select: { slug: true, updatedAt: true },
+  })
 
-  const postEntries: MetadataRoute.Sitemap = posts
+  const postEntries: MetadataRoute.Sitemap = result.docs
     .filter((post): post is typeof post & { slug: string } => Boolean(post.slug))
     .map((post) => ({
       url: `${baseUrl}/${post.slug}`,
