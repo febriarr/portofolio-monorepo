@@ -23,7 +23,7 @@ export function ProjectDetail({ project }: { project: ProjectWithMeta }) {
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="text-2xl leading-tight font-semibold">{project.title}</h1>
           {project.category && (
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="orange" className="text-xs">
               <TagIcon className="mr-1 size-3" />
               {project.category.name}
             </Badge>
