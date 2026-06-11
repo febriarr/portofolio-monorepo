@@ -4,7 +4,7 @@ import { getPayload } from 'payload'
 
 const baseUrl = 'https://blog.febriardiansyah.my.id'
 
-export const revalidate = 3600 // revalidate setiap 1 jam
+export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const payload = await getPayload({ config: configPromise })
