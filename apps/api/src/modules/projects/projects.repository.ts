@@ -3,7 +3,7 @@ import { Database } from "@/config/db"
 import { projectImages, projects, projectTechStacks } from "@/config/db/schema"
 import { CreateProject, ProjectsFilter, UpdateProject } from "@workspace/validator"
 import { Project, ProjectWithMeta } from "@workspace/shared"
-import { eq, ilike, inArray, SQL } from "drizzle-orm"
+import { desc, eq, ilike, inArray, SQL } from "drizzle-orm"
 import { QueryHelper } from "@/shared/helpers/query-helper"
 import { NotFoundError } from "@/shared/errors/custom-error"
 import { IProjectsRepository } from "@/modules/projects/projects.interface"
@@ -118,6 +118,7 @@ export class ProjectsRepository
           images: true,
           techStacks: { with: { techStack: true } },
         },
+        orderBy: desc(projects.createdAt),
       }),
       this.database.$count(projects, where),
     ])
