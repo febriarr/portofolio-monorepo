@@ -91,9 +91,7 @@ export default async function BlogDetailPage({ params }: Args) {
                 <Avatar>
                   <AvatarImage
                     src={
-                      typeof post.author.avatar === 'object'
-                        ? (post.author.avatar?.url ?? '')
-                        : ''
+                      typeof post.author.avatar === 'object' ? (post.author.avatar?.url ?? '') : ''
                     }
                     alt={post.author.name ?? ''}
                   />
@@ -115,7 +113,6 @@ export default async function BlogDetailPage({ params }: Args) {
               width={post.heroImage.width ?? 1200}
               height={post.heroImage.height ?? 630}
               className="w-full object-contain h-auto border rounded-xl"
-              priority
             />
           </div>
         ) : null}

@@ -10,6 +10,8 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@workspace/ui/components/tabs"
 import Image from "next/image"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@workspace/ui/components/tooltip"
+import { useState } from "react"
+import { cn } from "@workspace/ui/lib/utils"
 
 const CATEGORIES = ["frontend", "backend", "database", "tools", "language"] as const
 type Category = (typeof CATEGORIES)[number]
@@ -30,6 +32,7 @@ export default function AboutSection({ techStacks }: { techStacks: TechStackDeta
     },
     { language: [], frontend: [], backend: [], database: [], tools: [] }
   )
+  const [loading, setLoading] = useState(true)
 
   return (
     <section className="min-h-screen w-full space-y-8 py-16 md:space-y-12 lg:space-y-16" id="about">
@@ -146,7 +149,11 @@ export default function AboutSection({ techStacks }: { techStacks: TechStackDeta
                               alt={item.name}
                               width={500}
                               height={500}
-                              className="aspect-square h-16 w-16 object-contain lg:h-24 lg:w-24"
+                              onLoad={() => setLoading(false)}
+                              className={cn(
+                                "aspect-square h-full w-full object-contain transition-opacity duration-300",
+                                loading ? "opacity-0" : "opacity-100"
+                              )}
                             />
                           </TooltipTrigger>
                           <TooltipContent className="capitalize">{item.name}</TooltipContent>
