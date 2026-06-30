@@ -151,7 +151,7 @@ export default function AboutSection({ techStacks }: { techStacks: TechStackDeta
                               height={500}
                               onLoad={() => setLoading(false)}
                               className={cn(
-                                "aspect-square h-full w-full object-contain transition-opacity duration-300",
+                                "aspect-square h-16 w-16 object-contain transition-opacity duration-300 lg:h-24 lg:w-24",
                                 loading ? "opacity-0" : "opacity-100"
                               )}
                             />
