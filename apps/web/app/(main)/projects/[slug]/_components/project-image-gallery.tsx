@@ -15,7 +15,7 @@ export function ProjectImageGallery({ images, title }: { images: ProjectImages[]
           src={`${process.env.NEXT_PUBLIC_LINK_R2}/${current!.imageUrl}`}
           alt={`${title} - image ${activeImage + 1}`}
           fill
-          className="object-cover transition-all duration-300"
+          className="object-contain transition-all duration-300"
           priority
         />
         <div className="absolute right-3 bottom-3 rounded-xs bg-black/60 px-2 py-1 text-xs text-white backdrop-blur-sm">
