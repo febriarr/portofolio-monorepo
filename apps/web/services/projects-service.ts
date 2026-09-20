@@ -63,9 +63,8 @@ export const projectsService = {
 
     Object.entries(payload).forEach(([key, value]) => {
       if (value === undefined || value === null) return
-
       if (Array.isArray(value)) {
-        formData.append(key, JSON.stringify(value))
+        value.forEach((v) => formData.append(key, String(v)))
       } else {
         formData.append(key, String(value))
       }
