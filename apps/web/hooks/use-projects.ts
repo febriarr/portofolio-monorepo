@@ -94,11 +94,20 @@ export const useUpdateProject = () => {
       images?: File[]
       thumbnail?: File
     }) => {
-      if (images?.length || thumbnail) {
+      const hasImageChanges =
+        (images?.length ?? 0) > 0 ||
+        !!thumbnail ||
+        (payload.deletedImagePaths?.length ?? 0) > 0 ||
+        !!payload.deletedThumbnailPath
+
+      if (hasImageChanges) {
         const res = await projectsService.updateWithImages(id, payload, images, thumbnail)
+
         return res.data
       }
+
       const res = await projectsService.update(id, payload)
+
       return res.data
     },
     onSuccess: (_, { id }) => {

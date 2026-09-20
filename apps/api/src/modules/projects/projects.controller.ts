@@ -63,8 +63,14 @@ export class ProjectsController {
 
   update = asyncHandler(async (req: Request, res: Response) => {
     const id = Number(req.params.id)
+    const payload = {
+      ...req.body,
+      deletedImagePaths: req.body.deletedImagePaths
+        ? JSON.parse(req.body.deletedImagePaths)
+        : undefined,
+    }
 
-    const project = await this.projectsService.update(id, req.body)
+    const project = await this.projectsService.update(id, payload)
 
     return successResponse({
       res,
