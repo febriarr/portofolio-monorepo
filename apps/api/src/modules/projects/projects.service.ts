@@ -102,7 +102,7 @@ export class ProjectsService
     // Hapus thumbnail lama jika ada
     if (deletedThumbnailPath) {
       await this.imageService.deleteImages([deletedThumbnailPath])
-      data.thumbnailUrl = null // atau undefined tergantung schema
+      data.thumbnailUrl = null
     }
 
     // Hapus images lama jika ada

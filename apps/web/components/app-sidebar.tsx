@@ -78,8 +78,8 @@ export default function AppSidebar({ children }: { children: React.ReactNode }) 
                   tooltip={item.title}
                   asChild
                   className={`${
-                    pathname === item.link || pathname.startsWith(item.link + '/') 
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                    pathname === item.link
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
                       : ""
                   }`}
                 >

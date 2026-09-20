@@ -19,6 +19,7 @@ import { Textarea } from "@workspace/ui/components/textarea"
 import { Button } from "@workspace/ui/components/button"
 import { XIcon, ImageIcon } from "@phosphor-icons/react"
 import Image from "next/image"
+import { useRouter } from "next/router"
 
 const MAX_IMAGES = 10
 
@@ -44,6 +45,7 @@ export function SheetEditProject({
   const [newPreviews, setNewPreviews] = useState<{ file: File; url: string }[]>([])
   const [deletedImagePaths, setDeletedImagePaths] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const router = useRouter()
 
   const { mutate: updateProject, isPending } = useUpdateProject()
 
@@ -152,7 +154,12 @@ export function SheetEditProject({
 
     updateProject(
       { id: project.id, payload, images, thumbnail: newThumbnail?.file },
-      { onSuccess: () => onOpenChange(false) }
+      {
+        onSuccess: () => {
+          router.push("/dashboard/projects")
+          onOpenChange(false)
+        },
+      }
     )
   }
 
