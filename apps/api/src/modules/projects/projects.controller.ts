@@ -100,8 +100,22 @@ export class ProjectsController {
   updateWithImages = asyncHandler(async (req: Request, res: Response) => {
     const id = Number(req.params.id)
     const files = req.files as ProjectUploadedFiles | undefined
+    const payload = {
+      ...req.body,
+      techStackIds: Array.isArray(req.body.techStackIds)
+        ? req.body.techStackIds.map(Number)
+        : req.body.techStackIds
+          ? [Number(req.body.techStackIds)]
+          : undefined,
 
-    const project = await this.projectsService.updateWithImages(id, req.body, files)
+      deletedImagePaths: Array.isArray(req.body.deletedImagePaths)
+        ? req.body.deletedImagePaths
+        : req.body.deletedImagePaths
+          ? [req.body.deletedImagePaths]
+          : undefined,
+    }
+
+    const project = await this.projectsService.updateWithImages(id, payload, files)
 
     return successResponse({
       res,
